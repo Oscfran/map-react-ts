@@ -1,23 +1,33 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import useClipboard from "../Hooks/useClipboard.js";
 import useDocumentTitle from "../Hooks/useDocumentTitle.js";
 import useLocalStorage from "../Hooks/useLocalStorage.js";
 import useQueryParameters from "../Hooks/useQueryParameters.js";
+import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
+import getLocationName from "../Funtions/getLocationName.tsx"
+import { Toast, Dialog } from "radix-ui";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import "../Styles/Radix.css";
 import "../Styles/Map.css";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
+type Data = { 
+	name: string; 
+	lat: number;
+	lng: number;
+  }
 
 const MapApi = () => {
 	const { params, setQueryParameters } = useQueryParameters();
-	const { copied, copyToClipboard } = useClipboard();
+	const { copyToClipboard } = useClipboard();
 	const [storedLocation, setStoredLocation] = useLocalStorage("mapLocation", {
 		lat: 9.8990415,
 		lng: -84.1556396,
 	});
 	const [map, setMap] = useState<google.maps.Map>();
-	const [name, setName] = useState("");
 	const [pageTitle, setPageTitle] = useState("My map!!!");
 	const [latitude, setLatitude] = useState<number>(
 		Number.parseFloat(params.get("latitude") || "") || storedLocation.lat,
@@ -30,6 +40,11 @@ const MapApi = () => {
 	const [markers, setMarkers] = useState<
 		google.maps.marker.AdvancedMarkerElement[]
 	>([]);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors }
+	  } = useForm<Data>();
 	useEffect(() => {
 		// Initialize and add the map
 		((g) => {
@@ -89,7 +104,7 @@ const MapApi = () => {
 				},
 			);
 			const newInfoWindow = new window.google.maps.InfoWindow();
-			const placeName = await getLocationName(latitude, longitude);
+			const placeName = await getLocationName(latitude, longitude, API);
 			setMap(newMap);
 			setPageTitle(placeName);
 			setInfoWindow(newInfoWindow);
@@ -112,7 +127,7 @@ const MapApi = () => {
 					lng: clickedLng,
 				});
 				const fetchName = async () => {
-					const placeName = await getLocationName(clickedLat, clickedLng);
+					const placeName = await getLocationName(clickedLat, clickedLng, API);
 					setPageTitle(placeName);
 				};
 				fetchName();
@@ -123,8 +138,8 @@ const MapApi = () => {
 				//the infowindow has diferent carateristics so we are going to divided by sections
 				const contentString = `
 				<div>
-					<p class= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
-					<button id="default-button"> Copy to clipboard </button>
+					<p className= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
+					<button className="Button"> Copy to clipboard </button>
 				</div>
 				`;
 
@@ -150,49 +165,31 @@ const MapApi = () => {
 		}
 	}, [map, infoWindow]);
 
-	const getLocationName = async (lat: number, lng: string | number) => {
-		const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${API}`;
-		try {
-			const response = await fetch(url);
-			const data = await response.json();
-			if (data.results.length > 0) {
-				return data.results[0].formatted_address;
-			}
-			return "Unknown location";
-		} catch (error) {
-			console.error("Error getting places name", error);
-			return "Error getting places name";
-		}
-	};
 
-	const handleSubmitSetMarker = async (e) => {
-		e.preventDefault();
-		if (name && latitude && longitude) {
-			const pos = {
-				lat: latitude,
-				lng: longitude,
-			};
-			const { AdvancedMarkerElement } =
-				await google.maps.importLibrary("marker");
+	const handleSubmitSetMarker = async (data : Data) => {
+		const pos = {
+			lat: data.lat,
+			lng: data.lng,
+		};
+		
+		const { AdvancedMarkerElement } =
+			await google.maps.importLibrary("marker");
 
-			const marker = new AdvancedMarkerElement({
-				map: map,
-				position: pos,
-				title: name,
-			});
-			const placeName = await getLocationName(latitude, longitude);
-			await setStoredLocation({
-				lat: pos.lat,
-				lng: pos.lng,
-			});
-			setMarkers([...markers, marker]);
-			setPageTitle(placeName);
-			if (map) {
-				map.panTo(pos);
-				map.setZoom(14);
-			}
-		} else {
-			alert("All inputs must be filled");
+		const marker = await new AdvancedMarkerElement({
+			map: map,
+			position: pos,
+			title: data.name,
+		});
+		const placeName = await getLocationName(latitude, longitude, API);
+		await setStoredLocation({
+			lat: pos.lat,
+			lng: pos.lng,
+		});
+		setMarkers([...markers, marker]);
+		setPageTitle(placeName);
+		if (map) {
+			map.panTo(pos);
+			map.setZoom(14);
 		}
 	};
 
@@ -228,13 +225,20 @@ const MapApi = () => {
 				new AdvancedMarkerElement({
 					map: map,
 					position: pos,
-					title: name,
+					title: "My location",
 				});
-				const placeName = await getLocationName(pos.lat, pos.lng);
+				const placeName = await getLocationName(pos.lat, pos.lng, API);
 
 				setPageTitle(placeName);
 				setLoading(false);
 			});
+			const fetchDistance = async () => {
+				const distance = await getDistanceBetweenPoints({ lat: 10, lng: 150.644 },{ lat: -34.397, lng: 150.644 })
+				console.log(distance);
+			};
+			fetchDistance(); //Fetch distance check
+			
+			
 		} else {
 			// Browser doesn't support Geolocation
 			alert("Browser doesn't support Geolocation!!!");
@@ -246,35 +250,73 @@ const MapApi = () => {
 	return (
 		<div id="general-container">
 			<title> {pageTitle} </title>
-			Welcome to my map,
-			<form onSubmit={handleSubmitSetMarker}>
-				<input
-					onChange={(e) => setName(e.target.value)}
-					type={"text"}
-					placeholder={"Enter Place Name"}
-				/>
-				<input
-					onChange={(e) => setLatitude(Number.parseFloat(e.target.value))}
-					type="number"
-					step="0.0000001"
-					min="-90"
-					max="90"
-					placeholder={"Enter latitude"}
-				/>
-				<input
-					onChange={(e) => setLongitude(Number.parseFloat(e.target.value))}
-					type="number"
-					step="0.0000001"
-					min="-90"
-					max="90"
-					placeholder={"Enter your longitude"}
-				/>
-				<button id="default-button" type="submit">
-					Add marker
-				</button>
-			</form>
+			<Dialog.Root>
+				<Dialog.Trigger asChild>
+					<button type="button" className="Button violet">Add new marker</button>
+				</Dialog.Trigger>
+				<Dialog.Portal>
+					<Dialog.Overlay className="DialogOverlay" />
+					<Dialog.Content className="DialogContent">
+						<Dialog.Title className="DialogTitle">Add new marker</Dialog.Title>
+						<Dialog.Description className="DialogDescription">
+							Put the correct details of your marker. Click save when you're done.
+						</Dialog.Description>
+						<form className="form-markers" onSubmit={handleSubmit(handleSubmitSetMarker)}>
+							<fieldset className="Fieldset">
+								<label className="Label" htmlFor="name">
+									Name
+								</label>
+								<input className="Input" id="name" defaultValue="Home"
+									type={"text"}
+									placeholder={"Enter name"}
+									{...register("name", {
+										required: true,
+										minLength: 4
+									})}
+								/>
+							</fieldset>
+							<fieldset className="Fieldset">
+								<label className="Label" htmlFor="latitude">
+									Latitude
+								</label>
+								<input className="Input" id="latitude" defaultValue="0" step="0.000001" min="-90" max="90"
+									type={"number"}
+									placeholder={"Enter latitude"}
+									{...register("lat", {
+										required: true,
+										minLength: 1
+									})}
+								/>
+							</fieldset>
+							<fieldset className="Fieldset">
+								<label className="Label" htmlFor="longitude">
+									Longitude
+								</label>
+								<input className="Input" id="longitude" defaultValue="0" step="0.000001" min="-90" max="90"
+									type={"number"}
+									placeholder={"Enter longitude"}
+									{...register("lng", {
+										required: true,
+										minLength: 1
+									})}
+								/>
+							</fieldset>
+						<div className="save-button"
+						>
+
+								<button type="submit" className="Button green">Save marker</button>
+						</div>
+						</form>
+						<Dialog.Close asChild>
+							<button type="button" className="IconButton" aria-label="Close">
+								<Cross2Icon />
+							</button>
+						</Dialog.Close>
+					</Dialog.Content>
+				</Dialog.Portal>
+			</Dialog.Root>
 			<button
-				id="default-button"
+				className="Button"
 				type="button"
 				disabled={isLoading}
 				onClick={handleClickWhereAmI}
@@ -282,7 +324,6 @@ const MapApi = () => {
 				{isLoading ? "Loading..." : "Where am i?"}
 			</button>
 			<div id="map-list">
-				<div id="map-container" />
 				<div id="marker-list">
 					<h2>List of markers</h2>
 					{markers.length <= 0
@@ -290,12 +331,13 @@ const MapApi = () => {
 						: markers.map((item, index) => (
 								<li key={index}>
 									<span id="list-element">{item.title}</span>
-									<button type="button" onClick={() => handleRemove(item)}>
+									<button className="Button" type="button" onClick={() => handleRemove(item)}>
 										Remove
 									</button>
 								</li>
 							))}
 				</div>
+				<div id="map-container" />
 			</div>
 		</div>
 	);

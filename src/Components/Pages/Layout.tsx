@@ -4,19 +4,21 @@ import "../Styles/Layout.css";
 const Index = () => {
 	return (
 		<>
+		<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Untitled+Sans"/>
 			<header>
-				<nav className="navbar">
+				<nav className="navbar" aria-label="Header Navigation">
 					<ul className="navlist">
 						<li className="item">
 							<Link to="/">Home</Link>
 						</li>
 						<li className="item">
-							<Link to="/counter">About</Link>
+							<Link to="/about">About</Link>
 						</li>
 					</ul>
 				</nav>
 			</header>
-			<main>
+			<main className="layout-outlet">
 				<Outlet /> {/* Renders the current route's component */}
 			</main>
 			<footer aria-label="Footer">
