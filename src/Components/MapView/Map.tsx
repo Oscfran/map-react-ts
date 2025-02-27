@@ -14,7 +14,6 @@ import "../Styles/Map.css";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
-const defaultLocation = { lat: 9.8990415, lng: -84.1556396 };
 type Data = { 
 	name: string; 
 	lat: number;
@@ -24,7 +23,7 @@ type Data = {
 const MapApi = () => {
 	const { params, setQueryParameters } = useQueryParameters();
 	const { copyToClipboard } = useClipboard();
-	const [storedLocation, setStoredLocation] = useLocalStorage<{lat: number, lng:number}>("mapLocation", defaultLocation);
+	const [storedLocation, setStoredLocation] = useLocalStorage<{lat: number, lng:number}>("mapLocation", { lat: 9.8990415, lng: -84.1556396 });
 	const [map, setMap] = useState<google.maps.Map>();
 	const [pageTitle, setPageTitle] = useState("My map!!!");
 	const [latitude, setLatitude] = useState<number>(
@@ -138,7 +137,7 @@ const MapApi = () => {
 				const contentString = `
 				<div>
 					<p className= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
-					<button className="Button"> Copy to clipboard </button>
+					<button className="copy-btn"> Copy to clipboard </button>
 				</div>
 				`;
 
@@ -149,13 +148,13 @@ const MapApi = () => {
 
 				//Wait for the infowindow to be rendered
 				setTimeout(() => {
-					const copyBtn = document.getElementById("copy-btn");
+					const copyBtn = document.getElementById("copy-btn") as HTMLElement;
 					if (copyBtn) {
 						copyBtn.addEventListener("click", () =>
 							copyToClipboard(locationURL),
 						);
 					}
-				}, 100);
+				}, 3000);
 			};
 			map.addListener("click", handleMapClick);
 			return () => {

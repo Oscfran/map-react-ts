@@ -42,7 +42,7 @@
 	font-size: 15px;
 	line-height: 1.5;
 }
-
+.copy-btn,
 .Button {
 	display: inline-flex;
 	align-items: center;
@@ -55,9 +55,11 @@
 	height: 35px;
 	user-select: none;
 }
+.copy-btn:focus:not(:focus-visible),
 .Button:focus:not(:focus-visible) {
 	outline: 0;
 }
+.copy-btn:focus-visible,
 .Button:focus-visible {
 	outline: 2px solid var(--violet-6);
 	outline-offset: 1px;
