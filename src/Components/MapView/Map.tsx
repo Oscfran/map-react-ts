@@ -7,8 +7,8 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import useQueryParameters from "../Hooks/useQueryParameters.tsx";
 import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
 import getLocationName from "../Funtions/getLocationName.tsx"
-import { Dialog } from "radix-ui";
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { Dialog, Tabs } from "radix-ui";
+import { Cross2Icon,TrashIcon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
 
@@ -18,6 +18,7 @@ type Data = {
 	name: string; 
 	lat: number;
 	lng: number;
+	images: string[];
   }
 
 const MapApi = () => {
@@ -136,8 +137,9 @@ const MapApi = () => {
 				//the infowindow has diferent carateristics so we are going to divided by sections
 				const contentString = `
 				<div>
+					<h3>Selected location</h3>
 					<p className= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
-					<button className="copy-btn"> Copy to clipboard </button>
+					<button id="copy-btn" > Copy to clipboard </button>
 				</div>
 				`;
 
@@ -146,15 +148,16 @@ const MapApi = () => {
 				infoWindow.setPosition({ lat: clickedLat, lng: clickedLng });
 				infoWindow.open(map);
 
-				//Wait for the infowindow to be rendered
-				setTimeout(() => {
-					const copyBtn = document.getElementById("copy-btn") as HTMLElement;
+				const observer = new MutationObserver(() => {
+					const copyBtn = document.getElementById("copy-btn");
 					if (copyBtn) {
 						copyBtn.addEventListener("click", () =>
-							copyToClipboard(locationURL),
+							copyToClipboard(locationURL)
 						);
+						observer.disconnect();
 					}
-				}, 3000);
+				});
+				observer.observe(document.body,{childList:true, subtree:true})
 			};
 			map.addListener("click", handleMapClick);
 			return () => {
@@ -247,98 +250,126 @@ const MapApi = () => {
 	useDocumentTitle(pageTitle);
 
 	return (
-		<div id="general-container">
+		<div className="general-container">
 			<title> {pageTitle} </title>
-			<Dialog.Root open={open} onOpenChange={setOpen}>
-				<Dialog.Trigger asChild>
-					<button type="button" className="Button violet" onClick={() => setOpen(true)}>Add new marker</button>
-				</Dialog.Trigger>
-				<Dialog.Portal>
-					<Dialog.Overlay className="DialogOverlay" />
-					<Dialog.Content className="DialogContent">
-						<Dialog.Title className="DialogTitle">Add new marker</Dialog.Title>
-						<Dialog.Description className="DialogDescription">
-							Put the correct details of your marker. Click save when you're done.
-						</Dialog.Description>
-						<form className="form-markers" onSubmit={handleSubmit(handleSubmitSetMarker)}>
-							<fieldset className="Fieldset">
-								<label className="Label" htmlFor="name">
-									Name
-								</label>
-								<input className="Input" id="name" defaultValue="Home"
-									type={"text"}
-									placeholder={"Enter name"}
-									{...register("name", {
-										required: true,
-										minLength: 4
-									})}
-								/>
-							</fieldset>
-							<fieldset className="Fieldset">
-								<label className="Label" htmlFor="latitude">
-									Latitude
-								</label>
-								<input className="Input" id="latitude" defaultValue="0" step="0.000001" min="-90" max="90"
-									type={"number"}
-									placeholder={"Enter latitude"}
-									{...register("lat", {
-										required: true,
-										minLength: 1
-									})}
-								/>
-							</fieldset>
-							<fieldset className="Fieldset">
-								<label className="Label" htmlFor="longitude">
-									Longitude
-								</label>
-								<input className="Input" id="longitude" defaultValue="0" step="0.000001" min="-90" max="90"
-									type={"number"}
-									placeholder={"Enter longitude"}
-									{...register("lng", {
-										required: true,
-										minLength: 1
-									})}
-								/>
-							</fieldset>
-						<div className="save-button"
-						>
 
-								<button type="submit" className="Button green">Save marker</button>
-						</div>
-						</form>
-						<Dialog.Close asChild>
-							<button type="button" className="IconButton" aria-label="Close">
-								<Cross2Icon />
-							</button>
-						</Dialog.Close>
-					</Dialog.Content>
-				</Dialog.Portal>
-			</Dialog.Root>
-			<button
-				className="Button"
-				type="button"
-				disabled={isLoading}
-				onClick={handleClickWhereAmI}
-			>
-				{isLoading ? "Loading..." : "Where am i?"}
-			</button>
-			<div id="map-list">
-				<div id="marker-list">
-					<h2>List of markers</h2>
-					{markers.length <= 0
-						? "You dont have markers yet"
-						: markers.map((item, index) => (
-								<li key={index}>
-									<span id="list-element">{item.title}</span>
-									<button className="Button" type="button" onClick={() => handleRemove(item)}>
-										Remove
-									</button>
-								</li>
-							))}
-				</div>
-				<div id="map-container" />
-			</div>
-		</div>
+
+			<Tabs.Root className="TabsRoot" defaultValue="tab1">
+				<Tabs.List className="TabsList" aria-label="Filters">
+					<Tabs.Trigger className="TabsTrigger" value="tab1">
+						Filters
+					</Tabs.Trigger>
+					<Tabs.Trigger className="TabsTrigger" value="tab2">
+						Markers
+					</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content className="TabsContent" value="tab1">
+					<div className="filters">
+						<button
+							type="button"
+							className="Button"
+							disabled={isLoading}
+							onClick={handleClickWhereAmI}
+						>
+							{isLoading ? "Loading..." : "Around me"}
+						</button>
+					</div>
+				</Tabs.Content>
+				<Tabs.Content className="TabsContent" value="tab2">
+				<Dialog.Root open={open} onOpenChange={setOpen}>
+							<Dialog.Trigger asChild>
+								<button type="button" className="Button violet" onClick={() => setOpen(true)}>Add new marker</button>
+							</Dialog.Trigger>
+							<Dialog.Portal>
+								<Dialog.Overlay className="DialogOverlay" />
+								<Dialog.Content className="DialogContent">
+									<Dialog.Title className="DialogTitle">Add new marker</Dialog.Title>
+									<Dialog.Description className="DialogDescription">
+										Put the correct details of your marker. Click save when you're done.
+									</Dialog.Description>
+									<form className="form-markers" onSubmit={handleSubmit(handleSubmitSetMarker)}>
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="name">
+												Name
+											</label>
+											<input className="Input" id="name"
+												type={"text"}
+												placeholder={"Enter name"}
+												{...register("name", {
+													required: true,
+													minLength: 4
+												})}
+											/>
+										</fieldset>
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="latitude">
+												Latitude
+											</label>
+											<input className="Input" id="latitude" step="0.000001" min="-90" max="90"
+												type={"number"}
+												placeholder={"Enter latitude"}
+												{...register("lat", {
+													required: true,
+													minLength: 1
+												})}
+											/>
+										</fieldset>
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="longitude">
+												Longitude
+											</label>
+											<input className="Input" id="longitude" step="0.000001" min="-90" max="90"
+												type={"number"}
+												placeholder={"Enter longitude"}
+												{...register("lng", {
+													required: true,
+													minLength: 1
+												})}
+											/>
+										</fieldset>
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="images">
+												Image URLs
+											</label>
+											<input className="Input" id="images"
+												type={"text"}
+												placeholder={"Enter URL for images"}
+												{...register("lng", {
+													required: false,
+													minLength: 1
+												})}
+											/>
+										</fieldset>
+									<div className="save-button"
+									>
+
+											<button type="submit" className="Button green">Save marker</button>
+									</div>
+									</form>
+									<Dialog.Close asChild>
+										<button type="button" className="IconButton" aria-label="Close">
+											<Cross2Icon />
+										</button>
+									</Dialog.Close>
+								</Dialog.Content>
+							</Dialog.Portal>
+						</Dialog.Root>
+					<div className="marker-list">
+						<h2>List of markers</h2>
+						{markers.length <= 0
+							? "You dont have markers yet"
+							: markers.map((item, index) => (
+									<li key={index}>
+										<span className="list-element">{item.title}</span>
+										<button className="Button" type="button" aria-label="remove-marker" onClick={() => handleRemove(item)}>
+											<TrashIcon />
+										</button>
+									</li>
+								))}
+					</div>
+				</Tabs.Content>
+			</Tabs.Root>
+			<div id="map-container" /></div>
 	);
 };
 export default MapApi;

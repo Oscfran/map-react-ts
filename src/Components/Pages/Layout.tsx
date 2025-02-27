@@ -5,10 +5,10 @@ const Index = () => {
 	return (
 		<>
 		<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css?family=Untitled+Sans"/>
-			<header>
-				<nav className="navbar" aria-label="Header Navigation">
-					<ul className="navlist">
+  		href="https://fonts.googleapis.com/css?family=Untitled+Sans"/>
+			<header className="header-bar">
+				<nav className="nav-bar" aria-label="Header Navigation">
+					<ul className="slider-menu">
 						<li className="item">
 							<Link to="/">Home</Link>
 						</li>
@@ -24,7 +24,7 @@ const Index = () => {
 			<footer aria-label="Footer">
 				<p>&copy; Oscar Hernandez, 2025.</p>
 				<nav aria-label="Footer Navigation">
-					<ul>
+					<ul  className="footer-list">
 						<li>
 							<Link to="/privacy-policy">Privacy Policy</Link>
 						</li>
