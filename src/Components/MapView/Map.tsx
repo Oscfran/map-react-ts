@@ -1,19 +1,20 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import useClipboard from "../Hooks/useClipboard.js";
-import useDocumentTitle from "../Hooks/useDocumentTitle.js";
-import useLocalStorage from "../Hooks/useLocalStorage.js";
-import useQueryParameters from "../Hooks/useQueryParameters.js";
+import useClipboard from "../Hooks/useClipboard.tsx";
+import useDocumentTitle from "../Hooks/useDocumentTitle.tsx";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import useQueryParameters from "../Hooks/useQueryParameters.tsx";
 import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
 import getLocationName from "../Funtions/getLocationName.tsx"
-import { Toast, Dialog } from "radix-ui";
+import { Dialog } from "radix-ui";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
+const defaultLocation = { lat: 9.8990415, lng: -84.1556396 };
 type Data = { 
 	name: string; 
 	lat: number;
@@ -23,20 +24,18 @@ type Data = {
 const MapApi = () => {
 	const { params, setQueryParameters } = useQueryParameters();
 	const { copyToClipboard } = useClipboard();
-	const [storedLocation, setStoredLocation] = useLocalStorage("mapLocation", {
-		lat: 9.8990415,
-		lng: -84.1556396,
-	});
+	const [storedLocation, setStoredLocation] = useLocalStorage<{lat: number, lng:number}>("mapLocation", defaultLocation);
 	const [map, setMap] = useState<google.maps.Map>();
 	const [pageTitle, setPageTitle] = useState("My map!!!");
 	const [latitude, setLatitude] = useState<number>(
-		Number.parseFloat(params.get("latitude") || "") || storedLocation.lat,
+		Number.parseFloat(params.get("latitude") ?? "") || storedLocation.lat,
 	);
 	const [longitude, setLongitude] = useState<number>(
-		Number.parseFloat(params.get("longitude") || "") || storedLocation.lat,
+		Number.parseFloat(params.get("longitude") ?? "") || storedLocation.lng,
 	);
 	const [infoWindow, setInfoWindow] = useState<google.maps.InfoWindow>();
 	const [isLoading, setLoading] = useState(false);
+	const [open, setOpen] = useState<boolean>(false);
 	const [markers, setMarkers] = useState<
 		google.maps.marker.AdvancedMarkerElement[]
 	>([]);
@@ -99,7 +98,7 @@ const MapApi = () => {
 				document.getElementById("map-container") as HTMLElement,
 				{
 					zoom: 8,
-					center: { lat: latitude, lng: longitude },
+					center: { lat: Number(latitude), lng: Number(longitude) },
 					mapId: "app",
 				},
 			);
@@ -168,10 +167,10 @@ const MapApi = () => {
 
 	const handleSubmitSetMarker = async (data : Data) => {
 		const pos = {
-			lat: data.lat,
-			lng: data.lng,
+			lat: Number(data.lat),
+			lng: Number(data.lng),
 		};
-		
+
 		const { AdvancedMarkerElement } =
 			await google.maps.importLibrary("marker");
 
@@ -191,6 +190,7 @@ const MapApi = () => {
 			map.panTo(pos);
 			map.setZoom(14);
 		}
+		setOpen(false);
 	};
 
 	const handleRemove = async (
@@ -250,9 +250,9 @@ const MapApi = () => {
 	return (
 		<div id="general-container">
 			<title> {pageTitle} </title>
-			<Dialog.Root>
+			<Dialog.Root open={open} onOpenChange={setOpen}>
 				<Dialog.Trigger asChild>
-					<button type="button" className="Button violet">Add new marker</button>
+					<button type="button" className="Button violet" onClick={() => setOpen(true)}>Add new marker</button>
 				</Dialog.Trigger>
 				<Dialog.Portal>
 					<Dialog.Overlay className="DialogOverlay" />
