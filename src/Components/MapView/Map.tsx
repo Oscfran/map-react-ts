@@ -8,18 +8,23 @@ import useQueryParameters from "../Hooks/useQueryParameters.tsx";
 import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
 import getLocationName from "../Funtions/getLocationName.tsx"
 import { Dialog, Tabs } from "radix-ui";
-import { Cross2Icon,TrashIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
+import isValidURL from "../Funtions/isValidURL.tsx";
+import MarkerCard from "../Elements/MarkerCard.tsx";
+import Index from "../Pages/Layout.tsx";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
-type Data = { 
+interface MarkerInfo { 
 	name: string; 
 	lat: number;
 	lng: number;
-	images: string[];
+	imageURLs: string[];
+	description: string;
   }
+
 
 const MapApi = () => {
 	const { params, setQueryParameters } = useQueryParameters();
@@ -36,14 +41,18 @@ const MapApi = () => {
 	const [infoWindow, setInfoWindow] = useState<google.maps.InfoWindow>();
 	const [isLoading, setLoading] = useState(false);
 	const [open, setOpen] = useState<boolean>(false);
-	const [markers, setMarkers] = useState<
-		google.maps.marker.AdvancedMarkerElement[]
-	>([]);
+	const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
+	const [markerData, setMarkerData] = useLocalStorage<MarkerInfo[]>("markers", []);
+	const [imageURL, setImageURL] = useState("");
 	const {
 		register,
 		handleSubmit,
+		setValue,
+		watch,
 		formState: { errors }
-	  } = useForm<Data>();
+	  } = useForm<MarkerInfo>();
+	  const imageURLs = watch("imageURLs") || [];
+
 	useEffect(() => {
 		// Initialize and add the map
 		((g) => {
@@ -110,6 +119,7 @@ const MapApi = () => {
 		}
 
 		initMap();
+		
 	}, []);
 
 	useEffect(() => {
@@ -160,14 +170,31 @@ const MapApi = () => {
 				observer.observe(document.body,{childList:true, subtree:true})
 			};
 			map.addListener("click", handleMapClick);
+			if (markerData.length > 0){
+				const fetchMarkers = async () => {
+					const { AdvancedMarkerElement } =
+					await google.maps.importLibrary("marker");
+					
+					
+					const newMarkers = markerData.map((info) => {
+						const marker = new AdvancedMarkerElement({
+							map: map,
+							position: {lat: Number(info.lat), lng:Number(info.lng)},
+							title: info.name
+						});
+						return marker;
+					});
+					setMarkers(newMarkers);
+				};
+				fetchMarkers();
+			}
 			return () => {
 				window.google.maps.event.clearListeners(map, "click"); //clear listeners
 			};
 		}
 	}, [map, infoWindow]);
 
-
-	const handleSubmitSetMarker = async (data : Data) => {
+	const handleSubmitSetMarker = async (data : MarkerInfo) => {
 		const pos = {
 			lat: Number(data.lat),
 			lng: Number(data.lng),
@@ -182,25 +209,33 @@ const MapApi = () => {
 			title: data.name,
 		});
 		const placeName = await getLocationName(latitude, longitude, API);
-		await setStoredLocation({
+		setStoredLocation({
 			lat: pos.lat,
 			lng: pos.lng,
 		});
 		setMarkers([...markers, marker]);
+		setMarkerData((prev) => [...prev, data]);
 		setPageTitle(placeName);
 		if (map) {
 			map.panTo(pos);
 			map.setZoom(14);
 		}
 		setOpen(false);
+		setValue("name", "");
+		setValue("lat", 0);
+		setValue("lng", 0);
+		setValue("description", "");
+		setValue("imageURLs", []);
+
 	};
 
-	const handleRemove = async (
-		item: google.maps.marker.AdvancedMarkerElement,
+	const handleRemove = (
+		item: google.maps.marker.AdvancedMarkerElement, index: number
 	) => {
 		setMarkers((markers) => {
 			return markers.filter((marker) => marker !== item);
 		});
+		setMarkerData((prev) => prev.filter((_, i) => i !== index));
 		item.setMap(null);
 	};
 
@@ -222,13 +257,6 @@ const MapApi = () => {
 					map.panTo(pos);
 					map.setZoom(14);
 				}
-				const { AdvancedMarkerElement } =
-					await google.maps.importLibrary("marker");
-				new AdvancedMarkerElement({
-					map: map,
-					position: pos,
-					title: "My location",
-				});
 				const placeName = await getLocationName(pos.lat, pos.lng, API);
 
 				setPageTitle(placeName);
@@ -246,6 +274,24 @@ const MapApi = () => {
 			alert("Browser doesn't support Geolocation!!!");
 		}
 	};
+
+	const handleAddImage = async () => {
+		if(!imageURL.trim()){
+			alert("Insert URL!!!")
+		}
+
+		const isValid = await isValidURL(imageURL);
+		if(isValid){
+			setValue("imageURLs", [...imageURLs,imageURL]);
+			setImageURL("");
+		} else if (imageURL.trim()){
+			alert("Insert a valid image URL!!!");
+		}
+	}
+	const handleRemoveImage = (index: number) =>{
+		const newImageURLS = imageURLs.filter((_, i) => i !== index);
+		setValue("imageURLs", newImageURLS);
+	}
 
 	useDocumentTitle(pageTitle);
 
@@ -327,6 +373,21 @@ const MapApi = () => {
 												})}
 											/>
 										</fieldset>
+
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="description">
+												Description
+											</label>
+											<input className="Input" id="description" maxLength={200}
+												type="text"
+												placeholder={"Enter description"}
+												{...register("description", {
+													required: true,
+													minLength: 1
+												})}
+											/>
+										</fieldset>
+
 										<fieldset className="Fieldset">
 											<label className="Label" htmlFor="images">
 												Image URLs
@@ -334,16 +395,27 @@ const MapApi = () => {
 											<input className="Input" id="images"
 												type={"text"}
 												placeholder={"Enter URL for images"}
-												{...register("lng", {
-													required: false,
-													minLength: 1
-												})}
+												value={imageURL}
+												onChange={(e) => setImageURL(e.target.value)}
 											/>
+											<button type="button" className="Button green" onClick={handleAddImage}>Add Image</button>
 										</fieldset>
+										<ul className="item-images">
+											{imageURLs.length === 0
+											? "You dont have images added"
+											:
+												imageURLs.map((url, index) => (
+													<li key={index} className="item-images">
+														{url.substring(0,15)}{"...  "}
+														<button type="button" className="Button green" onClick={() => handleRemoveImage(index)}> <TrashIcon/> </button>
+													</li>
+												))
+												}
+											</ul>
 									<div className="save-button"
 									>
 
-											<button type="submit" className="Button green">Save marker</button>
+											<button type="submit" className="Button green" aria-label="Save marker">Save marker</button>
 									</div>
 									</form>
 									<Dialog.Close asChild>
@@ -356,15 +428,16 @@ const MapApi = () => {
 						</Dialog.Root>
 					<div className="marker-list">
 						<h2>List of markers</h2>
-						{markers.length <= 0
+						{markerData.length <= 0
 							? "You dont have markers yet"
-							: markers.map((item, index) => (
-									<li key={index}>
-										<span className="list-element">{item.title}</span>
-										<button className="Button" type="button" aria-label="remove-marker" onClick={() => handleRemove(item)}>
-											<TrashIcon />
-										</button>
-									</li>
+							: markerData.map((marker, index) => (
+									<MarkerCard
+										key={index}
+										name={marker.name}
+										description={marker.description}
+										images={marker.imageURLs}
+										onDelete={() => handleRemove(markers[index],index)}
+									/>
 								))}
 					</div>
 				</Tabs.Content>

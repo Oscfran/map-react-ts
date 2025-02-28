@@ -106,7 +106,7 @@
 
 .Fieldset {
 	display: flex;
-    border-radius: 10px;
+    border: none;
 	gap: 20px;
 	align-items: center;
 	margin-bottom: 15px;

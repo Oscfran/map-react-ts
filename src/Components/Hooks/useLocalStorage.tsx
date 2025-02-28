@@ -15,7 +15,6 @@ function useLocalStorage(
 	});
 	const setValue = (value: string) => {
 		try {
-			console.log(value);
 			setStoredValue(value);
 			localStorage.setItem(key, JSON.stringify(value));
 		} catch {

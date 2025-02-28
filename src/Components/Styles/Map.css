@@ -25,7 +25,17 @@
 	margin: auto;
 	display: flex;
 }
-
+.item-images{
+	font-family: "Mona Sans", system-ui, sans-serif;
+	color: #ffffff;
+	padding-bottom: 15px;
+	font-size: 15px;
+	line-height: 1;
+	font-weight: 500;
+	height: 35px;
+	user-select: none;
+	justify-self: right;
+}
 .list-element {
 	margin: 10px 10px;
 	padding: 10px 10px;
