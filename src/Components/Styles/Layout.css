@@ -79,18 +79,17 @@
 
 body {
 	background-image: linear-gradient(to bottom right, 
-	#4c6ceb,
-	#506bd8,
-	#556dcd,
-	#596ec3,
-	#5e70b7,
-	#6472ab, 
-	#6f7aa7,
-	#707aa0, 
-	#717893,
-	#6b7186,
-	#777d93,
-	#7c8090);
+	#3D0E61,
+	#461177,
+	#4E148C,
+	#5829A7,
+	#613DC1,
+	#7364D2, 
+	#858AE3,
+	#8EB5F0, 
+	#93CAF6,
+	#97DFFC
+	);
 	margin-top: 0;
 	font-family: "Mona Sans", system-ui, sans-serif;
 }

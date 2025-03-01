@@ -7,13 +7,13 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import useQueryParameters from "../Hooks/useQueryParameters.tsx";
 import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
 import getLocationName from "../Funtions/getLocationName.tsx"
-import { Dialog, Tabs } from "radix-ui";
+import { Dialog, Slider, Tabs } from "radix-ui";
 import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
 import isValidURL from "../Funtions/isValidURL.tsx";
 import MarkerCard from "../Elements/MarkerCard.tsx";
-import Index from "../Pages/Layout.tsx";
+import Filters from "../Elements/filterComponent.tsx";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
@@ -23,6 +23,8 @@ interface MarkerInfo {
 	lng: number;
 	imageURLs: string[];
 	description: string;
+	rating: number;
+	favorite: boolean;
   }
 
 
@@ -44,13 +46,23 @@ const MapApi = () => {
 	const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
 	const [markerData, setMarkerData] = useLocalStorage<MarkerInfo[]>("markers", []);
 	const [imageURL, setImageURL] = useState("");
+	const [filters, setFilters] = useState({
+		searchQuery: "",
+		minRating: 0,
+		onlyFavorites: false,
+		onlyVisibleArea: false
+	});
 	const {
 		register,
 		handleSubmit,
 		setValue,
 		watch,
 		formState: { errors }
-	  } = useForm<MarkerInfo>();
+	  } = useForm<MarkerInfo>({
+		defaultValues:{
+			imageURLs:[],
+		}
+	  });
 	  const imageURLs = watch("imageURLs") || [];
 
 	useEffect(() => {
@@ -174,8 +186,7 @@ const MapApi = () => {
 				const fetchMarkers = async () => {
 					const { AdvancedMarkerElement } =
 					await google.maps.importLibrary("marker");
-					
-					
+				
 					const newMarkers = markerData.map((info) => {
 						const marker = new AdvancedMarkerElement({
 							map: map,
@@ -194,11 +205,26 @@ const MapApi = () => {
 		}
 	}, [map, infoWindow]);
 
+	const filteredMarkeredData = markerData.filter((marker) => {//deleting while filtering has errors due to index value
+		const matchesName = marker.name.toLowerCase().includes(filters.searchQuery.toLowerCase());
+		const matchesRating = marker.rating ? marker.rating >=filters.minRating : true;
+		const matchesFavorites = !filters.onlyFavorites || marker.favorite;
+		if (map && filters.onlyVisibleArea){
+			const bounds = map.getBounds();
+			const position = new google.maps.LatLng(marker.lat, marker.lng);
+			return matchesName && matchesRating && matchesFavorites && bounds?.contains(position);
+		} 
+		return matchesName && matchesRating && matchesFavorites;
+	});
+
+
 	const handleSubmitSetMarker = async (data : MarkerInfo) => {
+		console.log(data.imageURLs.length)
 		const pos = {
 			lat: Number(data.lat),
 			lng: Number(data.lng),
 		};
+
 
 		const { AdvancedMarkerElement } =
 			await google.maps.importLibrary("marker");
@@ -226,7 +252,6 @@ const MapApi = () => {
 		setValue("lng", 0);
 		setValue("description", "");
 		setValue("imageURLs", []);
-
 	};
 
 	const handleRemove = (
@@ -319,6 +344,7 @@ const MapApi = () => {
 						>
 							{isLoading ? "Loading..." : "Around me"}
 						</button>
+						<Filters filters={filters} setFilters={setFilters}/>
 					</div>
 				</Tabs.Content>
 				<Tabs.Content className="TabsContent" value="tab2">
@@ -389,6 +415,38 @@ const MapApi = () => {
 										</fieldset>
 
 										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="rating">
+												Rating
+											</label>
+											<input className="Input" id="rating" 
+												type="number"
+												min="0"
+												max= "5"
+												step="0.5"
+												placeholder={"Enter rating"}
+												{...register("rating", {
+													required : true,
+													min : 0,
+													max : 5
+												})}
+											/>
+
+																			
+										</fieldset>
+
+										<fieldset className="Fieldset">
+											<label className="Label" htmlFor="favorite">
+												Favorite
+											</label>
+											<input className="Input" id="favorite" maxLength={200}
+												type="checkbox"
+												placeholder={"Enter description"}
+												{...register("favorite")}
+											/>
+										</fieldset>
+										
+
+										<fieldset className="Fieldset">
 											<label className="Label" htmlFor="images">
 												Image URLs
 											</label>
@@ -412,9 +470,7 @@ const MapApi = () => {
 												))
 												}
 											</ul>
-									<div className="save-button"
-									>
-
+									<div className="save-button">
 											<button type="submit" className="Button green" aria-label="Save marker">Save marker</button>
 									</div>
 									</form>
@@ -428,15 +484,17 @@ const MapApi = () => {
 						</Dialog.Root>
 					<div className="marker-list">
 						<h2>List of markers</h2>
-						{markerData.length <= 0
+						{filteredMarkeredData.length <= 0
 							? "You dont have markers yet"
-							: markerData.map((marker, index) => (
+							: filteredMarkeredData.map((marker, index) => (
 									<MarkerCard
 										key={index}
 										name={marker.name}
 										description={marker.description}
 										images={marker.imageURLs}
 										onDelete={() => handleRemove(markers[index],index)}
+										rating={marker.rating}
+										favorite={marker.favorite}
 									/>
 								))}
 					</div>

@@ -6,7 +6,10 @@
 	display: flex;
 	justify-content: center;
 }
-
+.checkbox-wrapper{
+	display: flex;
+	align-items: center;
+}
 .marker-list {
 	margin: 10px 10px;
 	text-align: center;
@@ -23,7 +26,6 @@
 .filters{
 	justify-content: center;
 	margin: auto;
-	display: flex;
 }
 .item-images{
 	font-family: "Mona Sans", system-ui, sans-serif;
