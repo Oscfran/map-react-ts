@@ -8,7 +8,7 @@ import useQueryParameters from "../Hooks/useQueryParameters.tsx";
 import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
 import getLocationName from "../Funtions/getLocationName.tsx"
 import { Dialog, Slider, Tabs } from "radix-ui";
-import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, StarIcon, TrashIcon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
 import isValidURL from "../Funtions/isValidURL.tsx";
@@ -56,13 +56,16 @@ const MapApi = () => {
 		register,
 		handleSubmit,
 		setValue,
+		getValues,
 		watch,
 		formState: { errors }
 	  } = useForm<MarkerInfo>({
 		defaultValues:{
-			imageURLs:[],
+			imageURLs : [],
+			rating : 1
 		}
 	  });
+	  const [sliderValue, setSliderValue] = useState(0);
 	  const imageURLs = watch("imageURLs") || [];
 
 	useEffect(() => {
@@ -418,19 +421,24 @@ const MapApi = () => {
 											<label className="Label" htmlFor="rating">
 												Rating
 											</label>
-											<input className="Input" id="rating" 
-												type="number"
-												min="0"
-												max= "5"
-												step="0.5"
-												placeholder={"Enter rating"}
-												{...register("rating", {
-													required : true,
-													min : 0,
-													max : 5
-												})}
-											/>
+											<Slider.Root
+												className="SliderRoot"
+												defaultValue={[0]}
+												min={1}
+												max={5}
+												step={0.5}
+												onValueChange={(value) => {
+													setValue("rating", value[0]);
+													setSliderValue(value[0]);
 
+												}}
+												aria-label="Rating">
+													<Slider.Track className="SliderTrack">
+														<Slider.Range className="SliderRange"/>
+													</Slider.Track>
+													<Slider.Thumb className="SliderThumb" aria-label="Rating"/>
+												</Slider.Root>
+												<span className="Label"> {sliderValue} <StarIcon /> </span>
 																			
 										</fieldset>
 
@@ -438,7 +446,7 @@ const MapApi = () => {
 											<label className="Label" htmlFor="favorite">
 												Favorite
 											</label>
-											<input className="Input" id="favorite" maxLength={200}
+											<input className="Input" id="favorite"
 												type="checkbox"
 												placeholder={"Enter description"}
 												{...register("favorite")}

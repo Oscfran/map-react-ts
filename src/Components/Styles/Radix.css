@@ -54,7 +54,7 @@
 }
 
 .SliderTrack {
-	background-color: var(--black-a10);
+	background-color: #7f7f7f;
 	position: relative;
 	flex-grow: 1;
 	border-radius: 9999px;

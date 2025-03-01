@@ -1,6 +1,7 @@
 import * as CheckBox from "@radix-ui/react-checkbox";
 import * as Slider from "@radix-ui/react-slider";
 import { CheckIcon, HeartFilledIcon, StarIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
 
 
 interface FiltersProps{
@@ -13,7 +14,9 @@ interface FiltersProps{
     setFilters : React.Dispatch<React.SetStateAction<any>>;
 }
 
+
 const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
+    const [sliderValue, setSliderValue] = useState(0);
     return (
         <div className="filters">
                 <input 
@@ -64,16 +67,20 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
                     <Slider.Root
                         className="SliderRoot"
                         value={[filters.minRating]}
-                        onValueChange={(value) => setFilters((prev) => ({...prev, minRating: value[0]}) )}
                         min={0}
                         max={5}
                         step={0.5}
+                        onValueChange={(value) => {
+                            setFilters((prev) => ({...prev, minRating: value[0]}));
+                            setSliderValue(value[0]);
+                    }}
                         >
                             <Slider.Track className="SliderTrack">
                                 <Slider.Range className="SliderRange"/>
                             </Slider.Track>
                             <Slider.Thumb className="SliderThumb" aria-label="Rating"/>
                         </Slider.Root>
+                        <span className="Label"> {sliderValue} <StarIcon /> </span>
                 </label>
                 
 
