@@ -5,13 +5,13 @@ import useClipboard from "../Hooks/useClipboard.tsx";
 import useDocumentTitle from "../Hooks/useDocumentTitle.tsx";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import useQueryParameters from "../Hooks/useQueryParameters.tsx";
-import getDistanceBetweenPoints from "../Funtions/getDistanceBetweenPoints.tsx"
-import getLocationName from "../Funtions/getLocationName.tsx"
+import getDistanceBetweenPoints from "../Utils/getDistanceBetweenPoints.tsx"
+import getLocationName from "../Utils/getLocationName.tsx"
 import { Dialog, Slider, Tabs } from "radix-ui";
 import { Cross2Icon, StarIcon, TrashIcon } from "@radix-ui/react-icons";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
-import isValidURL from "../Funtions/isValidURL.tsx";
+import isValidURL from "../Utils/isValidURL.tsx";
 import MarkerCard from "../Elements/MarkerCard.tsx";
 import Filters from "../Elements/filterComponent.tsx";
 
@@ -45,7 +45,7 @@ const MapApi = () => {
 	const [open, setOpen] = useState<boolean>(false);
 	const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
 	const [markerData, setMarkerData] = useLocalStorage<MarkerInfo[]>("markers", []);
-	const [imageURL, setImageURL] = useState("");
+	const [imageURL, setImageURL] = useState<string>("");
 	const [filters, setFilters] = useState({
 		searchQuery: "",
 		minRating: 0,
@@ -220,6 +220,10 @@ const MapApi = () => {
 		return matchesName && matchesRating && matchesFavorites;
 	});
 
+	const handleAddMarkerInfowindow = async (data : MarkerInfo) => {
+		console.log("funciona", data);
+	}
+
 
 	const handleSubmitSetMarker = async (data : MarkerInfo) => {
 		console.log(data.imageURLs.length)
@@ -255,6 +259,8 @@ const MapApi = () => {
 		setValue("lng", 0);
 		setValue("description", "");
 		setValue("imageURLs", []);
+		setValue("favorite", false);
+		setSliderValue(1);
 	};
 
 	const handleRemove = (
@@ -325,10 +331,7 @@ const MapApi = () => {
 
 	return (
 		<div className="general-container">
-			<title> {pageTitle} </title>
-
-
-			<Tabs.Root className="TabsRoot" defaultValue="tab1">
+			<Tabs.Root className="TabsRoot"defaultValue="tab1">
 				<Tabs.List className="TabsList" aria-label="Filters">
 					<Tabs.Trigger className="TabsTrigger" value="tab1">
 						Filters
@@ -380,7 +383,7 @@ const MapApi = () => {
 											<label className="Label" htmlFor="latitude">
 												Latitude
 											</label>
-											<input className="Input" id="latitude" step="0.000001" min="-90" max="90"
+											<input className="Input" id="latitude" step="0.000000000000001" min="-90" max="90"
 												type={"number"}
 												placeholder={"Enter latitude"}
 												{...register("lat", {
@@ -393,7 +396,7 @@ const MapApi = () => {
 											<label className="Label" htmlFor="longitude">
 												Longitude
 											</label>
-											<input className="Input" id="longitude" step="0.000001" min="-90" max="90"
+											<input className="Input" id="longitude" step="0.000000000000001" min="-90" max="90"
 												type={"number"}
 												placeholder={"Enter longitude"}
 												{...register("lng", {
@@ -493,7 +496,7 @@ const MapApi = () => {
 					<div className="marker-list">
 						<h2>List of markers</h2>
 						{filteredMarkeredData.length <= 0
-							? "You dont have markers yet"
+							? "Not markers to show"
 							: filteredMarkeredData.map((marker, index) => (
 									<MarkerCard
 										key={index}

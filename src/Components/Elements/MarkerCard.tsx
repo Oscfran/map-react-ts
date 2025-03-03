@@ -2,7 +2,7 @@ import type * as React from "react";
 import {Card, CardContent, CardActions, Button, Typography} from "@mui/material"
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y} from "swiper/modules";
-import { TrashIcon, HeartIcon, HeartFilledIcon, StarIcon} from "@radix-ui/react-icons";
+import { TrashIcon, HeartIcon, HeartFilledIcon, StarIcon, Pencil1Icon} from "@radix-ui/react-icons";
 import "swiper/css"
 import "swiper/css/navigation"
 
@@ -56,7 +56,9 @@ const MarkerCard: React.FC<MarkerCardProps> = ({name, description, images, onDel
                 <div>
                 <StarIcon/>{rating}
                 </div>
-                
+                <Button size="small" onClick={onDelete}>
+                    <Pencil1Icon/>
+                </Button>
                 <Button size="small" color="error" onClick={onDelete}>
                     <TrashIcon/>
                 </Button>
