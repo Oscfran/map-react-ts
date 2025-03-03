@@ -4,8 +4,6 @@ import "../Styles/Layout.css";
 const Index = () => {
 	return (
 		<>
-		<link rel="stylesheet"
-  		href="https://fonts.googleapis.com/css?family=Untitled+Sans"/>
 			<header className="header-bar">
 				<nav className="nav-bar" aria-label="Header Navigation">
 					<ul className="slider-menu">
@@ -24,7 +22,7 @@ const Index = () => {
 			<footer aria-label="Footer">
 				<p>&copy; Oscar Hernandez, 2025.</p>
 				<nav aria-label="Footer Navigation">
-					<ul  className="footer-list">
+					<ul className="footer-list">
 						<li>
 							<Link to="/privacy-policy">Privacy Policy</Link>
 						</li>
