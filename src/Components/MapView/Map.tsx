@@ -13,15 +13,15 @@ import "../Styles/Radix.css";
 import "../Styles/Map.css";
 import { Select } from "radix-ui";
 import MarkerCard from "../Elements/MarkerCard.tsx";
-import Filters from "../Elements/filterComponent.tsx";
+import Filters from "../Elements/FilterComponent.tsx";
 import isValidURL from "../Utils/isValidURL.tsx";
 import * as CheckBox from "@radix-ui/react-checkbox";
-import React from "react";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
 type Food = 'Asian' | 'Italian' | 'Fast-Food' | 'Fine-Dining' | 'Local-Food' | 'Buffet';
 interface MarkerInfo {
+	id: string;
 	name: string;
 	lat: number;
 	lng: number;
@@ -34,6 +34,7 @@ interface MarkerInfo {
 }
 
 const MapApi = () => {
+	const generateId = () => crypto.randomUUID();
 	const { params, setQueryParameters } = useQueryParameters();
 	const { copyToClipboard } = useClipboard();
 	const [storedLocation, setStoredLocation] = useLocalStorage<{
@@ -65,20 +66,27 @@ const MapApi = () => {
 		minRating: 0,
 		onlyFavorites: false,
 		onlyVisibleArea: false,
+		asianFood: false,
+		italianFood : false,
+		fastFood : false,
+		fineDiningFood : false,
+		localFood : false,
+		buffetFood: false,
+		maxPrice: 500
 	});
 	const {
 		register,
 		handleSubmit,
 		setValue,
-		getValues,
 		watch,
 		formState: { errors },
 	} = useForm<MarkerInfo>({
 		defaultValues: {
+			id: generateId(),
 			imageURLs: [],
 			rating: 1,
 			favorite : false,
-			foodType : 'Asian'
+			foodType : 'Asian',
 		},
 	});
 	const [sliderValue, setSliderValue] = useState(1);
@@ -166,25 +174,27 @@ const MapApi = () => {
 					lng: clickedLng,
 				});
 				const fetchName = async () => {
+					
 					const placeName = await getLocationName(clickedLat, clickedLng, API);
 					setPageTitle(placeName);
+					
+					
+					//the infowindow has diferent carateristics so we are going to divided by sections
+					const contentString = `
+					<div>
+						<h3>${placeName}</h3>
+						<p className= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
+						<button id="copy-btn" style="all: revert; border-radius: 4px; padding: 0 15px; font-size: 15px; line-height: 1; font-weight: 500; height: 35px; cursor : pointer"> Copy to clipboard </button>
+					</div>
+					`;
+
+					//shows infowindow with the coords
+					infoWindow.setContent(contentString);
 				};
 				fetchName();
 				setQueryParameters("latitude", String(clickedLat));
 				setQueryParameters("longitude", String(clickedLng));
 				const locationURL = `${BASE_URL}?latitude=${clickedLat}&longitude=${clickedLng}`;
-
-				//the infowindow has diferent carateristics so we are going to divided by sections
-				const contentString = `
-				<div>
-					<h3>Selected location</h3>
-					<p className= "infoWindow-text">Lat ${clickedLat.toFixed(5)}, Lng: ${clickedLng.toFixed(5)}</p>
-					<button id="copy-btn" style="all: revert; border-radius: 4px; padding: 0 15px; font-size: 15px; line-height: 1; font-weight: 500; height: 35px; cursor : pointer"> Copy to clipboard </button>
-				</div>
-				`;
-
-				//shows infowindow with the coords
-				infoWindow.setContent(contentString);
 				infoWindow.setPosition({ lat: clickedLat, lng: clickedLng });
 				infoWindow.open(map);
 
@@ -224,38 +234,57 @@ const MapApi = () => {
 	}, [map, infoWindow]);
 
 	const filteredMarkeredData = markerData.filter((marker) => {
-		//deleting while filtering has errors due to index value
 		const matchesName = marker.name
 			.toLowerCase()
 			.includes(filters.searchQuery.toLowerCase());
 		const matchesRating = marker.rating
 			? marker.rating >= filters.minRating
 			: true;
+
+		const matchesPrice = marker.price
+		? marker.price <= filters.maxPrice
+		: true;
+		
 		const matchesFavorites = !filters.onlyFavorites || marker.favorite;
+
+		const matchesAsian = !filters.asianFood && marker.foodType === 'Asian';
+		const matchesItalian = !filters.italianFood && marker.foodType === 'Italian';
+		const matchesFastFood = !filters.fastFood && marker.foodType === 'Fast-Food';
+		const matchesFineDining = !filters.fineDiningFood && marker.foodType === 'Fine-Dining';
+		const matchesLocalFood = !filters.localFood && marker.foodType === 'Local-Food';
+		const matchesBuffet = !filters.buffetFood && marker.foodType === 'Buffet';
+
+		const notFiltersActive = !(filters.asianFood || filters.italianFood || filters.fastFood || filters.fineDiningFood || filters.localFood || filters.buffetFood) 
+		const matchesType = !(matchesAsian || matchesItalian || matchesFastFood || matchesFineDining || matchesLocalFood || matchesBuffet) || notFiltersActive;
+
+
 		if (map && filters.onlyVisibleArea) {
 			const bounds = map.getBounds();
 			const position = new google.maps.LatLng(marker.lat, marker.lng);
 			return (
 				matchesName &&
 				matchesRating &&
+				matchesPrice &&
 				matchesFavorites &&
+				matchesType &&
 				bounds?.contains(position)
 			);
 		}
-		return matchesName && matchesRating && matchesFavorites;
+		return matchesName && matchesRating && matchesPrice && matchesFavorites && matchesType;
 	});
 
 	const handleEdit = async (
-		item: google.maps.marker.AdvancedMarkerElement,
-		index: number,) => {
-		console.log("bien");
+		id: string
+	) => {
+		const index = markerData.findIndex(item => item.id === id);
+		console.log(id);
 	};
 	const handleTarget = async(
-		item: google.maps.marker.AdvancedMarkerElement,
+		item: MarkerInfo,
 	) => {
 		const pos ={
-			lat: Number(item.position?.lat),
-			lng: Number(item.position?.lng)
+			lat: Number(item.lat),
+			lng: Number(item.lng)
 		};
 		setStoredLocation(pos);
 		map?.panTo(pos);
@@ -287,27 +316,29 @@ const MapApi = () => {
 		map?.panTo(pos);
 		map?.setZoom(14);
 		setOpen(false);
+		setValue("id",generateId());
 		setValue("name", "");
 		setValue("lat", 0);
 		setValue("lng", 0);
 		setValue("description", "");
 		setValue("imageURLs", []);
 		setValue("favorite", false);
-		setValue("rating", 0);
+		setValue("rating", 1);
+		setValue("price", 0);
 		setValue("foodType", 'Asian');
 		setSliderValue(1);
 		setFavorite(false);
 	};
 
 	const handleRemove = (
-		item: google.maps.marker.AdvancedMarkerElement,
-		index: number,
+		id: string,
 	) => {
+		const index = markerData.findIndex(item => item.id === id);
+		markers[index].map = null;
 		setMarkers((markers) => {
-			return markers.filter((marker) => marker !== item);
+			return markers.filter((marker) => marker !== markers[index]);
 		});
-		setMarkerData((prev) => prev.filter((_, i) => i !== index));
-		item.map = null;
+		setMarkerData((prev) => prev.filter((marker) => marker.id !== id));
 	};
 
 	const handleClickWhereAmI = async () => {
@@ -491,6 +522,7 @@ const MapApi = () => {
 										</label>
 										<Slider.Root
 											className="SliderRoot"
+											value={[sliderValue]}
 											min={1}
 											max={5}
 											step={0.5}
@@ -522,8 +554,12 @@ const MapApi = () => {
 											className="Input"
 											id="price"
 											type="number"
+											min={0}
+											max={500}
 											placeholder={"Enter average price"}
-											{...register("price")}
+											{...register("price" ,{
+												required: true
+											})}
 										/>
 									</fieldset>
 
@@ -555,14 +591,14 @@ const MapApi = () => {
 																	<CheckIcon />
 																</Select.ItemIndicator>
 															</Select.Item>
-															<Select.Item className="SelectItem" value='Fast food'>
+															<Select.Item className="SelectItem" value='Fast-Food'>
 															<Select.ItemText>Fast Food</Select.ItemText>
 																<Select.ItemIndicator className="SelectItemIndicator">
 																	<CheckIcon />
 																</Select.ItemIndicator>
 															</Select.Item>
 
-															<Select.Item className="SelectItem" value='Fine-dining'>
+															<Select.Item className="SelectItem" value='Fine-Dining'>
 															<Select.ItemText>Fine Dining</Select.ItemText>
 																<Select.ItemIndicator className="SelectItemIndicator">
 																	<CheckIcon />
@@ -633,7 +669,7 @@ const MapApi = () => {
 										{imageURLs.length === 0
 											? "You dont have images added"
 											: imageURLs.map((url, index) => (
-													<li key={index} className="item-images">
+													<li key={`${url}-${index}`} className="item-images">
 														{url.substring(0, 15)}
 														{"...  "}
 														<button
@@ -674,15 +710,15 @@ const MapApi = () => {
 						<h2>List of markers</h2>
 						{filteredMarkeredData.length <= 0
 							? "Not markers to show"
-							: filteredMarkeredData.map((marker, index) => (
+							: filteredMarkeredData.map((marker) => (
 									<MarkerCard
-										key={index}
+										key={marker.id}
 										name={marker.name}
 										description={marker.description}
 										images={marker.imageURLs}
-										onDelete={() => handleRemove(markers[index], index)}
-										onEdit={() => handleEdit(markers[index], index)}
-										onTarget={() => handleTarget(markers[index])}
+										onDelete={() => handleRemove(marker.id)}
+										onEdit={() => handleEdit(marker.id)}
+										onTarget={() => handleTarget(marker)}
 										rating={marker.rating}
 										favorite={marker.favorite}
 										price={marker.price}

@@ -79,7 +79,10 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 					{description}
 				</Typography>
 				<Typography variant="body2">
-					Price: ${price}  Food type: {foodType}
+					Average Price: ${price}
+				</Typography>
+				<Typography variant="body2">
+					Food type: {foodType}
 				</Typography>
 			</CardContent>
 			<CardActions className="bottom-card">
