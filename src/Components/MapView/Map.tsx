@@ -1,24 +1,23 @@
-import { CheckIcon, ChevronDownIcon, Cross2Icon, StarIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { Dialog, Slider, Tabs } from "radix-ui";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import useClipboard from "../Hooks/useClipboard.tsx";
 import useDocumentTitle from "../Hooks/useDocumentTitle.tsx";
 import useQueryParameters from "../Hooks/useQueryParameters.tsx";
-import getDistanceBetweenPoints from "../Utils/getDistanceBetweenPoints.tsx";
 import getLocationName from "../Utils/getLocationName.tsx";
 import "../Styles/Radix.css";
 import "../Styles/Map.css";
-import { Select } from "radix-ui";
-import MarkerCard from "../Elements/MarkerCard.tsx";
-import Filters from "../Elements/FilterComponent.tsx";
-import isValidURL from "../Utils/isValidURL.tsx";
-import * as CheckBox from "@radix-ui/react-checkbox";
+import TabsComponent from "../Elements/TabsComponent.tsx";
 
 const API = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 const BASE_URL = "http://localhost:5173/";
-type Food = 'Asian' | 'Italian' | 'Fast-Food' | 'Fine-Dining' | 'Local-Food' | 'Buffet';
+type Food =
+	| "Asian"
+	| "Italian"
+	| "Fast-Food"
+	| "Fine-Dining"
+	| "Local-Food"
+	| "Buffet";
 interface MarkerInfo {
 	id: string;
 	name: string;
@@ -60,20 +59,20 @@ const MapApi = () => {
 		[],
 	);
 	const [imageURL, setImageURL] = useState<string>("");
-	const clearFilters = () =>  {
+	const clearFilters = () => {
 		setFilters({
 			searchQuery: "",
 			minRating: 0,
 			onlyFavorites: false,
 			onlyVisibleArea: false,
 			asianFood: false,
-			italianFood : false,
-			fastFood : false,
-			fineDiningFood : false,
-			localFood : false,
+			italianFood: false,
+			fastFood: false,
+			fineDiningFood: false,
+			localFood: false,
 			buffetFood: false,
 			maxPrice: 500,
-			clearFilters: () => clearFilters()
+			clearFilters: () => clearFilters(),
 		});
 	};
 	const [filters, setFilters] = useState({
@@ -82,30 +81,31 @@ const MapApi = () => {
 		onlyFavorites: false,
 		onlyVisibleArea: false,
 		asianFood: false,
-		italianFood : false,
-		fastFood : false,
-		fineDiningFood : false,
-		localFood : false,
+		italianFood: false,
+		fastFood: false,
+		fineDiningFood: false,
+		localFood: false,
 		buffetFood: false,
 		maxPrice: 500,
-		clearFilters: () => clearFilters()
+		clearFilters: () => clearFilters(),
 	});
 	const {
 		register,
 		handleSubmit,
 		setValue,
 		watch,
+		reset,
 		formState: { errors },
 	} = useForm<MarkerInfo>({
 		defaultValues: {
 			id: generateId(),
 			imageURLs: [],
-			rating: 1,
-			favorite : false,
-			foodType : 'Asian',
+			rating: 5,
+			favorite: false,
+			foodType: "Asian",
 		},
 	});
-	const [sliderValue, setSliderValue] = useState(1);
+	const [sliderValue, setSliderValue] = useState(5);
 	const imageURLs = watch("imageURLs") || [];
 
 	useEffect(() => {
@@ -143,7 +143,8 @@ const MapApi = () => {
 				}));
 			d[l]
 				? console.warn(`${p} + " only loads once. Ignoring:"`, g)
-				: (d[l] = (f: unknown, ...n: any) => r.add(f) && u().then(() => d[l](f, ...n)));
+				: (d[l] = (f: unknown, ...n: any) =>
+						r.add(f) && u().then(() => d[l](f, ...n)));
 		})({
 			key: API,
 			v: "weekly",
@@ -192,11 +193,9 @@ const MapApi = () => {
 					lng: clickedLng,
 				});
 				const fetchName = async () => {
-					
 					const placeName = await getLocationName(clickedLat, clickedLng, API);
 					setPageTitle(placeName);
-					
-					
+
 					//the infowindow has diferent carateristics so we are going to divided by sections
 					const contentString = `
 					<div>
@@ -259,488 +258,129 @@ const MapApi = () => {
 			? marker.rating >= filters.minRating
 			: true;
 
-		const matchesPrice = marker.price
-		? marker.price <= filters.maxPrice
-		: true;
-		
+		const matchesPrice = marker.price ? marker.price <= filters.maxPrice : true;
+
 		const matchesFavorites = !filters.onlyFavorites || marker.favorite;
 
-		const matchesAsian = !filters.asianFood && marker.foodType === 'Asian';
-		const matchesItalian = !filters.italianFood && marker.foodType === 'Italian';
-		const matchesFastFood = !filters.fastFood && marker.foodType === 'Fast-Food';
-		const matchesFineDining = !filters.fineDiningFood && marker.foodType === 'Fine-Dining';
-		const matchesLocalFood = !filters.localFood && marker.foodType === 'Local-Food';
-		const matchesBuffet = !filters.buffetFood && marker.foodType === 'Buffet';
+		const matchesAsian = !filters.asianFood && marker.foodType === "Asian";
+		const matchesItalian =
+			!filters.italianFood && marker.foodType === "Italian";
+		const matchesFastFood =
+			!filters.fastFood && marker.foodType === "Fast-Food";
+		const matchesFineDining =
+			!filters.fineDiningFood && marker.foodType === "Fine-Dining";
+		const matchesLocalFood =
+			!filters.localFood && marker.foodType === "Local-Food";
+		const matchesBuffet = !filters.buffetFood && marker.foodType === "Buffet";
 
-		const notFiltersActive = !(filters.asianFood || filters.italianFood || filters.fastFood || filters.fineDiningFood || filters.localFood || filters.buffetFood) 
-		const matchesType = !(matchesAsian || matchesItalian || matchesFastFood || matchesFineDining || matchesLocalFood || matchesBuffet) || notFiltersActive;
-		
-		const matchesVisible = !map || !filters.onlyVisibleArea || map.getBounds()?.contains({lat: Number(marker.lat), lng: Number(marker.lng)});
+		const notFiltersActive = !(
+			filters.asianFood ||
+			filters.italianFood ||
+			filters.fastFood ||
+			filters.fineDiningFood ||
+			filters.localFood ||
+			filters.buffetFood
+		);
+		const matchesType =
+			!(
+				matchesAsian ||
+				matchesItalian ||
+				matchesFastFood ||
+				matchesFineDining ||
+				matchesLocalFood ||
+				matchesBuffet
+			) || notFiltersActive;
 
-		return matchesName && matchesRating && matchesPrice && matchesFavorites && matchesType && matchesVisible;
+		const matchesVisible =
+			!map ||
+			!filters.onlyVisibleArea ||
+			map
+				.getBounds()
+				?.contains({ lat: Number(marker.lat), lng: Number(marker.lng) });
+
+		return (
+			matchesName &&
+			matchesRating &&
+			matchesPrice &&
+			matchesFavorites &&
+			matchesType &&
+			matchesVisible
+		);
 	});
 
-	const handleEdit = async (
-		id: string
-	) => {
-		const index = markerData.findIndex(item => item.id === id);
-		console.log(id);
-	};
-	const handleTarget = async(
-		item: MarkerInfo,
-	) => {
-		const pos ={
-			lat: Number(item.lat),
-			lng: Number(item.lng)
-		};
+	const updatePosition = (pos: { lat: number; lng: number }, zoom = 14) => {
 		setStoredLocation(pos);
 		map?.panTo(pos);
-		map?.setZoom(14);
-	}
-
-	const handleSubmitSetMarker = async (data: MarkerInfo) => {
-		console.log(data.imageURLs.length);
+		map?.setZoom(zoom);
+	};
+	const handleTarget = (item: MarkerInfo) => {
 		const pos = {
-			lat: Number(data.lat),
-			lng: Number(data.lng),
+			lat: Number(item.lat),
+			lng: Number(item.lng),
 		};
-
-		const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-
-		const marker = await new AdvancedMarkerElement({
-			map: map,
-			position: pos,
-			title: data.name,
-		});
-		const placeName = await getLocationName(latitude, longitude, API);
-		setStoredLocation({
-			lat: pos.lat,
-			lng: pos.lng,
-		});
-		setMarkers([...markers, marker]);
-		setMarkerData((prev) => [...prev, data]);
-		setPageTitle(placeName);
-		map?.panTo(pos);
-		map?.setZoom(14);
-		setOpen(false);
-		setValue("id",generateId());
-		setValue("name", "");
-		setValue("lat", 0);
-		setValue("lng", 0);
-		setValue("description", "");
-		setValue("imageURLs", []);
-		setValue("favorite", false);
-		setValue("rating", 1);
-		setValue("price", 0);
-		setValue("foodType", 'Asian');
-		setSliderValue(1);
-		setFavorite(false);
+		updatePosition(pos);
 	};
 
-	const handleRemove = (
-		id: string,
-	) => {
-		const index = markerData.findIndex(item => item.id === id);
-		markers[index].map = null;
-		setMarkers((markers) => {
-			return markers.filter((marker) => marker !== markers[index]);
-		});
-		setMarkerData((prev) => prev.filter((marker) => marker.id !== id));
+	const handleEdit = async (id: string) => {
+		const index = markerData.findIndex((item) => item.id === id);
+		console.log(id);
+	};
+
+	const handleRemove = (id: string) => {
+		const index = markerData.findIndex((item) => item.id === id);
+		if (index !== -1) {
+			markers[index].map = null;
+			setMarkers((markers) => {
+				return markers.filter((marker) => marker !== markers[index]);
+			});
+			setMarkerData((prev) => prev.filter((marker) => marker.id !== id));
+		}
 	};
 
 	const handleClickWhereAmI = async () => {
-		if (navigator.geolocation) 
-			{
-				setLoading(true);
-			navigator.geolocation.getCurrentPosition(async (position) => {
-				
-				setLatitude(position.coords.latitude);
-				setLongitude(position.coords.longitude);
-				const pos = {
-					lat: position.coords.latitude,
-					lng: position.coords.longitude,
-				};
-				setStoredLocation({
-					lat: position.coords.latitude,
-					lng: position.coords.longitude,
-				});
-				if (map) {
-					map.panTo(pos);
-					map.setZoom(14);
-				}
-				const placeName = await getLocationName(pos.lat, pos.lng, API);
-
-				setPageTitle(placeName);
-				setLoading(false);
-			});
-			const fetchDistance = async () => {
-				const distance = await getDistanceBetweenPoints(
-					{ lat: 10, lng: 150.644 },
-					{ lat: -34.397, lng: 150.644 },
-				);
-				console.log(distance);
-			};
-			fetchDistance(); //Fetch distance check
-		} else {
+		if (!navigator.geolocation) {
 			// Browser doesn't support Geolocation
 			alert("Browser doesn't support Geolocation!!!");
+			return;
 		}
+		setLoading(true);
+		navigator.geolocation.getCurrentPosition(async (position) => {
+			const pos = {
+				lat: position.coords.latitude,
+				lng: position.coords.longitude,
+			};
+			setLatitude(pos.lat);
+			setLongitude(pos.lng);
+			updatePosition(pos);
+			const placeName = await getLocationName(pos.lat, pos.lng, API);
+			setPageTitle(placeName);
+			setLoading(false);
+		});
 	};
 
-	const handleAddImage = async () => {
-		if (!imageURL.trim()) {
-			alert("Insert URL!!!");
-		}
-
-		const isValid = await isValidURL(imageURL);
-		if (isValid) {
-			setValue("imageURLs", [...imageURLs, imageURL]);
-			setImageURL("");
-		} else if (imageURL.trim()) {
-			alert("Insert a valid image URL!!!");
-		}
-	};
-	const handleRemoveImage = (index: number) => {
-		const newImageURLS = imageURLs.filter((_, i) => i !== index);
-		setValue("imageURLs", newImageURLS);
-	};
 
 	useDocumentTitle(pageTitle);
 
 	return (
-		<div className="general-container">
-			<Tabs.Root className="TabsRoot" defaultValue="tab1">
-				<Tabs.List className="TabsList" aria-label="Filters">
-					<Tabs.Trigger className="TabsTrigger" value="tab1">
-						Filters
-					</Tabs.Trigger>
-					<Tabs.Trigger className="TabsTrigger" value="tab2">
-						Restaurants
-					</Tabs.Trigger>
-				</Tabs.List>
-				<Tabs.Content className="TabsContent" value="tab1">
-					<div className="filters">
-						<button
-							type="button"
-							className="Button violet"
-							disabled={isLoading}
-							onClick={handleClickWhereAmI}
-						>
-							{isLoading ? "Loading...": "Restaurants around me"}
-						</button>
-						<Filters filters={filters} setFilters={setFilters} />
-					</div>
-				</Tabs.Content>
-				<Tabs.Content className="TabsContent" value="tab2">
-					<Dialog.Root open={open} onOpenChange={setOpen}>
-						<Dialog.Trigger asChild>
-							<button
-								type="button"
-								className="Button violet"
-								onClick={() => setOpen(true)}
-							>
-								Add new marker
-							</button>
-						</Dialog.Trigger>
-						<Dialog.Portal>
-							<Dialog.Overlay className="DialogOverlay" />
-							<Dialog.Content className="DialogContent">
-								<Dialog.Title className="DialogTitle">
-									Add new marker
-								</Dialog.Title>
-								<Dialog.Description className="DialogDescription">
-									Put the correct details of your marker. Click save when you're
-									done.
-								</Dialog.Description>
-								<form
-								noValidate
-									className="form-markers"
-									onSubmit={handleSubmit(handleSubmitSetMarker)}
-								>
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="name">
-											Name
-										</label>
-										<input
-											className="Input"
-											id="name"
-											type={"text"}
-											placeholder={"Enter name"}
-											{...register("name", {
-												required: true,
-												minLength: 4,
-											})}
-										/>
-										{errors.name && <span>This field is required</span>}
-									</fieldset>
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="latitude">
-											Latitude
-										</label>
-										<input
-											className="Input"
-											id="latitude"
-											step="0.000000000000001"
-											min="-90"
-											max="90"
-											type={"number"}
-											placeholder={"Enter latitude"}
-											{...register("lat", {
-												required: true,
-												minLength: 1,
-											})}
-										/>
-									</fieldset>
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="longitude">
-											Longitude
-										</label>
-										<input
-											className="Input"
-											id="longitude"
-											step="0.000000000000001"
-											min="-90"
-											max="90"
-											type={"number"}
-											placeholder={"Enter longitude"}
-											{...register("lng", {
-												required: true,
-												minLength: 1,
-											})}
-										/>
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="description">
-											Description
-										</label>
-										<input
-											className="Input"
-											id="description"
-											maxLength={200}
-											type="text"
-											placeholder={"Enter description"}
-											{...register("description", {
-												required: true,
-												minLength: 1,
-											})}
-										/>
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="rating">
-											Rating
-										</label>
-										<Slider.Root
-											className="SliderRoot"
-											value={[sliderValue]}
-											min={1}
-											max={5}
-											step={0.5}
-											onValueChange={(value) => {
-												setValue("rating", value[0]);
-												setSliderValue(value[0]);
-											}}
-											aria-label="Rating"
-										>
-											<Slider.Track className="SliderTrack">
-												<Slider.Range className="SliderRange" />
-											</Slider.Track>
-											<Slider.Thumb
-												className="SliderThumb"
-												aria-label="Rating"
-											/>
-										</Slider.Root>
-										<span className="Label">
-											{" "}
-											{sliderValue} <StarIcon />{" "}
-										</span>
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="price">
-											Price $
-										</label>
-										<input
-											className="Input"
-											id="price"
-											type="number"
-											min={0}
-											max={500}
-											placeholder={"Enter average price"}
-											{...register("price" ,{
-												required: true
-											})}
-										/>
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="foodType">
-											Type of Food
-										</label>
-										<Select.Root defaultValue='Asian' onValueChange={(value: Food) => setValue("foodType", value)}>
-											<Select.Trigger className="SelectTrigger" aria-label="Food type">
-												<Select.Value placeholder="Select a fruit…" />
-												<Select.Icon className="SelectIcon">
-													<ChevronDownIcon />
-												</Select.Icon>
-											</Select.Trigger>
-											<Select.Portal>
-													<Select.Content className="SelectContent">
-													<Select.Viewport className="SelectViewport">
-													<Select.Group>
-															<Select.Item className="SelectItem" value='Asian'>
-																<Select.ItemText>Asian</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-
-															<Select.Item className="SelectItem" value='Italian'>
-															<Select.ItemText>Italian</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-															<Select.Item className="SelectItem" value='Fast-Food'>
-															<Select.ItemText>Fast Food</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-
-															<Select.Item className="SelectItem" value='Fine-Dining'>
-															<Select.ItemText>Fine Dining</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-
-															<Select.Item className="SelectItem" value='Local-Food'>
-															<Select.ItemText>Local Food</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-
-															<Select.Item className="SelectItem" value='Buffet'>
-															<Select.ItemText>Buffet</Select.ItemText>
-																<Select.ItemIndicator className="SelectItemIndicator">
-																	<CheckIcon />
-																</Select.ItemIndicator>
-															</Select.Item>
-														</Select.Group>
-													</Select.Viewport>
-													</Select.Content>
-												</Select.Portal>
-										</Select.Root>
-										
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="favorite">
-											Favorite
-										</label>
-										<CheckBox.Root
-											checked={favorite}
-											className="CheckboxRoot"
-											onCheckedChange={(checked) => {
-												setValue("favorite", !!checked);
-												setFavorite(!!checked);
-											}}
-										>
-											<CheckBox.Indicator className="CheckboxInicator">
-												<CheckIcon />
-											</CheckBox.Indicator>
-										</CheckBox.Root>
-
-									</fieldset>
-
-									<fieldset className="Fieldset">
-										<label className="Label" htmlFor="images">
-											Image URLs
-										</label>
-										<input
-											className="Input"
-											id="images"
-											type={"text"}
-											placeholder={"Enter URL for images"}
-											value={imageURL}
-											onChange={(e) => setImageURL(e.target.value)}
-										/>
-										<button
-											type="button"
-											className="Button green"
-											onClick={handleAddImage}
-										>
-											Add Image
-										</button>
-									</fieldset>
-									<ul className="item-images">
-										{imageURLs.length === 0
-											? "You dont have images added"
-											: imageURLs.map((url, index) => (
-													<li key={`${url}-${index}`} className="item-images">
-														{url.substring(0, 15)}
-														{"...  "}
-														<button
-															type="button"
-															className="Button green"
-															onClick={() => handleRemoveImage(index)}
-														>
-															{" "}
-															<TrashIcon />{" "}
-														</button>
-													</li>
-												))}
-									</ul>
-									<div className="save-button">
-									<button
-											type="submit"
-											className="Button green"
-											aria-label="Save marker"
-										>
-											Save Restaurant
-										</button>
-										
-									</div>
-								</form>
-								<Dialog.Close asChild>
-									<button
-										type="button"
-										className="IconButton"
-										aria-label="Close"
-									>
-										<Cross2Icon />
-									</button>
-								</Dialog.Close>
-							</Dialog.Content>
-						</Dialog.Portal>
-					</Dialog.Root>
-					<div className="marker-list">
-						<h2>List of restaurants</h2>
-						{filteredMarkeredData.length <= 0
-							? "Without restaurants to show"
-							: filteredMarkeredData.map((marker) => (
-									<MarkerCard
-										key={marker.id}
-										name={marker.name}
-										description={marker.description}
-										images={marker.imageURLs}
-										onDelete={() => handleRemove(marker.id)}
-										onEdit={() => handleEdit(marker.id)}
-										onTarget={() => handleTarget(marker)}
-										rating={marker.rating}
-										favorite={marker.favorite}
-										price={marker.price}
-										foodType={marker.foodType}
-									/>
-								))}
-					</div>
-				</Tabs.Content>
-			</Tabs.Root>
-			<div id="map-container" />
-		</div>
+		<TabsComponent
+			isLoading = {isLoading}
+			handleClickWhereAmI={handleClickWhereAmI}
+			filters={filters}
+			setFilters={setFilters}
+			open={open}
+			setOpen={setOpen}
+			filteredMarkeredData={filteredMarkeredData}
+			handleRemove={handleRemove}
+			handleEdit={handleEdit}
+			handleTarget={handleTarget}
+			map={map}
+			markers={markers}
+			setMarkers={setMarkers}
+			setMarkerData={setMarkerData}
+			setPageTitle={setPageTitle}
+			updatePosition={updatePosition}
+			API={API}
+		/>
 	);
 };
 export default MapApi;

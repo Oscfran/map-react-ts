@@ -21,27 +21,27 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	border: 1px solid #4E148C;
-	border-radius: #858AE3;
+	border: 1px solid #4e148c;
+	border-radius: #858ae3;
 	padding: 10px;
 	cursor: pointer;
 	transition: all 0.2s ease;
-  }
-  .food-type-card.selected {
-	border-color: #93CAF6;
-	background-color: #97DFFC;
-  }
-  .food-icon {
+}
+.food-type-card.selected {
+	border-color: #93caf6;
+	background-color: #97dffc;
+}
+.food-icon {
 	width: 24px;
 	height: 24px;
-	background-color: #97DFFC;
+	background-color: #97dffc;
 	border-radius: 50%;
 	margin-bottom: 5px;
-  }
-  .food-type-card span {
+}
+.food-type-card span {
 	font-size: 12px;
 	text-align: center;
-  }
+}
 .TabsRoot {
 	display: flex;
 	flex-direction: column;
@@ -142,7 +142,7 @@
 .item-images {
 	overflow-y: auto;
 	font-family: "Mona Sans", system-ui, sans-serif;
-	color: #ffffff;
+	color: #000000;
 	font-size: 15px;
 	line-height: 1;
 	font-weight: 500;

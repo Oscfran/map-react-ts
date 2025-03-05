@@ -1,5 +1,10 @@
 import * as CheckBox from "@radix-ui/react-checkbox";
-import { CheckIcon, HeartFilledIcon, StarIcon,ChevronDownIcon } from "@radix-ui/react-icons";
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	HeartFilledIcon,
+	StarIcon,
+} from "@radix-ui/react-icons";
 import * as Slider from "@radix-ui/react-slider";
 import { useState } from "react";
 import type * as React from "react";
@@ -10,24 +15,23 @@ interface FiltersProps {
 		minRating: number;
 		onlyFavorites: boolean;
 		onlyVisibleArea: boolean;
-        asianFood: boolean;
-        italianFood : boolean;
-        fastFood : boolean;
-        fineDiningFood : boolean;
-        localFood : boolean;
-        buffetFood: boolean;
-        maxPrice: number;
-        clearFilters : () => void;
+		asianFood: boolean;
+		italianFood: boolean;
+		fastFood: boolean;
+		fineDiningFood: boolean;
+		localFood: boolean;
+		buffetFood: boolean;
+		maxPrice: number;
+		clearFilters: () => void;
 	};
 	setFilters: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 	const [ratingSliderValue, setRatingSliderValue] = useState(filters.minRating);
-    const [priceSliderValue, setPriceSliderValue] = useState(filters.maxPrice);
+	const [priceSliderValue, setPriceSliderValue] = useState(filters.maxPrice);
 	return (
 		<div className="filters">
-            
 			<input
 				placeholder="Search by name…"
 				className="Input"
@@ -36,19 +40,23 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 					setFilters((prev: any) => ({ ...prev, searchQuery: e.target.value }))
 				}
 			/>
-            <button
-                type="button"
-                className="Button violet"
-                onClick={() => {filters.clearFilters(); setPriceSliderValue(500);setRatingSliderValue(0)}}
-            >
-                clear Filters
-            </button>
+			<button
+				type="button"
+				className="Button violet"
+				onClick={() => {
+					filters.clearFilters();
+					setPriceSliderValue(500);
+					setRatingSliderValue(0);
+				}}
+			>
+				clear Filters
+			</button>
 
 			<div className="checkBoxGroup">
 				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.onlyFavorites}
-                        aria-label="Check box only favorite"
+						aria-label="Check box only favorite"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, onlyFavorites: !!checked }))
 						}
@@ -67,7 +75,7 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.onlyVisibleArea}
-                        aria-label="Check box only visible area"
+						aria-label="Check box only visible area"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, onlyVisibleArea: !!checked }))
 						}
@@ -105,14 +113,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 					{" "}
 					{ratingSliderValue} <StarIcon />{" "}
 				</span>
-                
 			</label>
 
-            <div className="food-types">
+			<div className="food-types">
 				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.asianFood}
-                        aria-label="Check box filter asian food"
+						aria-label="Check box filter asian food"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, asianFood: !!checked }))
 						}
@@ -123,15 +130,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Asian Food
-					</label>
+					<label className="Label-checkbox">Asian Food</label>
 				</div>
 
-                <div className="checkbox-wrapper">
+				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.italianFood}
-                        aria-label="Check box filter italian food"
+						aria-label="Check box filter italian food"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, italianFood: !!checked }))
 						}
@@ -142,15 +147,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Italian Food
-					</label>
+					<label className="Label-checkbox">Italian Food</label>
 				</div>
 
-                <div className="checkbox-wrapper">
+				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.fastFood}
-                        aria-label="Check box filter fast food"
+						aria-label="Check box filter fast food"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, fastFood: !!checked }))
 						}
@@ -161,15 +164,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Fast Food
-					</label>
+					<label className="Label-checkbox">Fast Food</label>
 				</div>
 
-                <div className="checkbox-wrapper">
+				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.fineDiningFood}
-                        aria-label="Check box filter fine dining food"
+						aria-label="Check box filter fine dining food"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, fineDiningFood: !!checked }))
 						}
@@ -180,15 +181,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Fine Dining Food
-					</label>
+					<label className="Label-checkbox">Fine Dining Food</label>
 				</div>
 
-                <div className="checkbox-wrapper">
+				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.localFood}
-                        aria-label="Check box filter local food"
+						aria-label="Check box filter local food"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, localFood: !!checked }))
 						}
@@ -199,15 +198,13 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Local Food
-					</label>
+					<label className="Label-checkbox">Local Food</label>
 				</div>
 
-                <div className="checkbox-wrapper">
+				<div className="checkbox-wrapper">
 					<CheckBox.Root
 						checked={filters.buffetFood}
-                        aria-label="Check box filter buffed"
+						aria-label="Check box filter buffed"
 						onCheckedChange={(checked) =>
 							setFilters((prev) => ({ ...prev, buffetFood: !!checked }))
 						}
@@ -218,14 +215,12 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 						</CheckBox.Indicator>
 					</CheckBox.Root>
 					{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-					<label className="Label-checkbox">
-						Buffet
-					</label>
+					<label className="Label-checkbox">Buffet</label>
 				</div>
 			</div>
-            {/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
+			{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
 			<label className="Slider">
-				Max Price:  
+				Max Price:
 				<Slider.Root
 					className="SliderRoot"
 					value={[filters.maxPrice]}
@@ -242,11 +237,7 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 					</Slider.Track>
 					<Slider.Thumb className="SliderThumb" aria-label="Max Price" />
 				</Slider.Root>
-				<span className="Label">
-					{" "}
-					${priceSliderValue}{" "}
-				</span>
-                
+				<span className="Label"> ${priceSliderValue} </span>
 			</label>
 		</div>
 	);

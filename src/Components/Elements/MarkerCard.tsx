@@ -10,7 +10,7 @@ import {
 	HeartIcon,
 	Pencil1Icon,
 	StarIcon,
-	TargetIcon
+	TargetIcon,
 } from "@radix-ui/react-icons";
 import type * as React from "react";
 import { A11y, Navigation } from "swiper/modules";
@@ -19,7 +19,13 @@ import AlertDialogMarker from "./AlertDialogMarker.tsx";
 import "swiper/css";
 import "swiper/css/navigation";
 
-type Food = 'Asian' | 'Italian' | 'Fast-Food' | 'Fine-Dining' | 'Local-Food' | 'Buffet';
+type Food =
+	| "Asian"
+	| "Italian"
+	| "Fast-Food"
+	| "Fine-Dining"
+	| "Local-Food"
+	| "Buffet";
 
 interface MarkerCardProps {
 	name: string;
@@ -30,8 +36,8 @@ interface MarkerCardProps {
 	onTarget: () => void;
 	rating: number;
 	favorite: boolean;
-	price : number;
-	foodType : Food;
+	price: number;
+	foodType: Food;
 }
 const MarkerCard: React.FC<MarkerCardProps> = ({
 	name,
@@ -81,9 +87,7 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 				<Typography variant="h6" color="success">
 					Average Price: ${price}
 				</Typography>
-				<Typography variant="h6">
-					Food type: {foodType}
-				</Typography>
+				<Typography variant="h6">Food type: {foodType}</Typography>
 			</CardContent>
 			<CardActions className="bottom-card">
 				{favorite ? <HeartFilledIcon /> : <HeartIcon />}
@@ -97,7 +101,11 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 				<Button size="large" onClick={onEdit} aria-label="Edit marker">
 					<Pencil1Icon />
 				</Button>
-				<AlertDialogMarker name={name} onDelete={() => onDelete()}  aria-label="Delete marker"/>
+				<AlertDialogMarker
+					name={name}
+					onDelete={() => onDelete()}
+					aria-label="Delete marker"
+				/>
 			</CardActions>
 		</Card>
 	);

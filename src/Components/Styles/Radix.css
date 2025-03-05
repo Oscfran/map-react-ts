@@ -136,9 +136,8 @@ button {
 	overflow: hidden;
 	background-color: white;
 	border-radius: 6px;
-	box-shadow:
-		0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-		0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+	box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px
+		rgba(22, 23, 24, 0.2);
 }
 
 .SelectViewport {
@@ -214,9 +213,8 @@ button {
 .ToastRoot {
 	background-color: white;
 	border-radius: 6px;
-	box-shadow:
-		hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
-		hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+	box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%)
+		0px 10px 20px -15px;
 	padding: 15px;
 	display: grid;
 	grid-template-areas: "title action" "description action";
@@ -512,7 +510,7 @@ button {
 .DialogTitle {
 	margin: 0;
 	font-weight: 500;
-	color: #3D0E61;
+	color: #3d0e61;
 	font-size: 17px;
 }
 
