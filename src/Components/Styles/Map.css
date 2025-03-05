@@ -88,6 +88,7 @@
 }
 
 .TabsContent {
+	z-index: 0;
 	flex-grow: 1;
 	overflow-y: auto;
 	padding-top: 20px;

@@ -1,7 +1,8 @@
 import * as CheckBox from "@radix-ui/react-checkbox";
-import { CheckIcon, HeartFilledIcon, StarIcon } from "@radix-ui/react-icons";
+import { CheckIcon, HeartFilledIcon, StarIcon,ChevronDownIcon } from "@radix-ui/react-icons";
 import * as Slider from "@radix-ui/react-slider";
 import { useState } from "react";
+import type * as React from "react";
 
 interface FiltersProps {
 	filters: {
@@ -16,6 +17,7 @@ interface FiltersProps {
         localFood : boolean;
         buffetFood: boolean;
         maxPrice: number;
+        clearFilters : () => void;
 	};
 	setFilters: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -25,6 +27,7 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
     const [priceSliderValue, setPriceSliderValue] = useState(filters.maxPrice);
 	return (
 		<div className="filters">
+            
 			<input
 				placeholder="Search by name…"
 				className="Input"
@@ -33,6 +36,14 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 					setFilters((prev: any) => ({ ...prev, searchQuery: e.target.value }))
 				}
 			/>
+            <button
+                type="button"
+                className="Button violet"
+                onClick={() => {filters.clearFilters(); setPriceSliderValue(500);setRatingSliderValue(0)}}
+            >
+                clear Filters
+            </button>
+
 			<div className="checkBoxGroup">
 				<div className="checkbox-wrapper">
 					<CheckBox.Root

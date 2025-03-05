@@ -78,10 +78,10 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 				<Typography variant="body2" color="text.secondary">
 					{description}
 				</Typography>
-				<Typography variant="body2">
+				<Typography variant="h6" color="success">
 					Average Price: ${price}
 				</Typography>
-				<Typography variant="body2">
+				<Typography variant="h6">
 					Food type: {foodType}
 				</Typography>
 			</CardContent>
@@ -91,10 +91,10 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 					<StarIcon />
 					{rating}
 				</div>
-				<Button size="small" onClick={onTarget} aria-label="Get to location">
+				<Button size="large" onClick={onTarget} aria-label="Get to location">
 					<TargetIcon />
 				</Button>
-				<Button size="small" onClick={onEdit} aria-label="Edit marker">
+				<Button size="large" onClick={onEdit} aria-label="Edit marker">
 					<Pencil1Icon />
 				</Button>
 				<AlertDialogMarker name={name} onDelete={() => onDelete()}  aria-label="Delete marker"/>

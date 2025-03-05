@@ -1,8 +1,7 @@
 import { CheckIcon, ChevronDownIcon, Cross2Icon, StarIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { Dialog, Slider, Tabs } from "radix-ui";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useClipboard from "../Hooks/useClipboard.tsx";
 import useDocumentTitle from "../Hooks/useDocumentTitle.tsx";
@@ -61,6 +60,22 @@ const MapApi = () => {
 		[],
 	);
 	const [imageURL, setImageURL] = useState<string>("");
+	const clearFilters = () =>  {
+		setFilters({
+			searchQuery: "",
+			minRating: 0,
+			onlyFavorites: false,
+			onlyVisibleArea: false,
+			asianFood: false,
+			italianFood : false,
+			fastFood : false,
+			fineDiningFood : false,
+			localFood : false,
+			buffetFood: false,
+			maxPrice: 500,
+			clearFilters: () => clearFilters()
+		});
+	};
 	const [filters, setFilters] = useState({
 		searchQuery: "",
 		minRating: 0,
@@ -72,7 +87,8 @@ const MapApi = () => {
 		fineDiningFood : false,
 		localFood : false,
 		buffetFood: false,
-		maxPrice: 500
+		maxPrice: 500,
+		clearFilters: () => clearFilters()
 	});
 	const {
 		register,
@@ -169,6 +185,8 @@ const MapApi = () => {
 				const clickedLng = e.latLng.lng();
 				setLatitude(clickedLat);
 				setLongitude(clickedLng);
+				setValue("lat", clickedLat);
+				setValue("lng", clickedLng);
 				setStoredLocation({
 					lat: clickedLat,
 					lng: clickedLng,
@@ -256,21 +274,10 @@ const MapApi = () => {
 
 		const notFiltersActive = !(filters.asianFood || filters.italianFood || filters.fastFood || filters.fineDiningFood || filters.localFood || filters.buffetFood) 
 		const matchesType = !(matchesAsian || matchesItalian || matchesFastFood || matchesFineDining || matchesLocalFood || matchesBuffet) || notFiltersActive;
+		
+		const matchesVisible = !map || !filters.onlyVisibleArea || map.getBounds()?.contains({lat: Number(marker.lat), lng: Number(marker.lng)});
 
-
-		if (map && filters.onlyVisibleArea) {
-			const bounds = map.getBounds();
-			const position = new google.maps.LatLng(marker.lat, marker.lng);
-			return (
-				matchesName &&
-				matchesRating &&
-				matchesPrice &&
-				matchesFavorites &&
-				matchesType &&
-				bounds?.contains(position)
-			);
-		}
-		return matchesName && matchesRating && matchesPrice && matchesFavorites && matchesType;
+		return matchesName && matchesRating && matchesPrice && matchesFavorites && matchesType && matchesVisible;
 	});
 
 	const handleEdit = async (
@@ -342,9 +349,11 @@ const MapApi = () => {
 	};
 
 	const handleClickWhereAmI = async () => {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(async (position) => {
+		if (navigator.geolocation) 
+			{
 				setLoading(true);
+			navigator.geolocation.getCurrentPosition(async (position) => {
+				
 				setLatitude(position.coords.latitude);
 				setLongitude(position.coords.longitude);
 				const pos = {
@@ -406,7 +415,7 @@ const MapApi = () => {
 						Filters
 					</Tabs.Trigger>
 					<Tabs.Trigger className="TabsTrigger" value="tab2">
-						Markers
+						Restaurants
 					</Tabs.Trigger>
 				</Tabs.List>
 				<Tabs.Content className="TabsContent" value="tab1">
@@ -417,7 +426,7 @@ const MapApi = () => {
 							disabled={isLoading}
 							onClick={handleClickWhereAmI}
 						>
-							{isLoading ? "Loading..." : "Around me"}
+							{isLoading ? "Loading...": "Restaurants around me"}
 						</button>
 						<Filters filters={filters} setFilters={setFilters} />
 					</div>
@@ -444,6 +453,7 @@ const MapApi = () => {
 									done.
 								</Dialog.Description>
 								<form
+								noValidate
 									className="form-markers"
 									onSubmit={handleSubmit(handleSubmitSetMarker)}
 								>
@@ -461,6 +471,7 @@ const MapApi = () => {
 												minLength: 4,
 											})}
 										/>
+										{errors.name && <span>This field is required</span>}
 									</fieldset>
 									<fieldset className="Fieldset">
 										<label className="Label" htmlFor="latitude">
@@ -689,7 +700,7 @@ const MapApi = () => {
 											className="Button green"
 											aria-label="Save marker"
 										>
-											Save marker
+											Save Restaurant
 										</button>
 										
 									</div>
@@ -707,9 +718,9 @@ const MapApi = () => {
 						</Dialog.Portal>
 					</Dialog.Root>
 					<div className="marker-list">
-						<h2>List of markers</h2>
+						<h2>List of restaurants</h2>
 						{filteredMarkeredData.length <= 0
-							? "Not markers to show"
+							? "Without restaurants to show"
 							: filteredMarkeredData.map((marker) => (
 									<MarkerCard
 										key={marker.id}
