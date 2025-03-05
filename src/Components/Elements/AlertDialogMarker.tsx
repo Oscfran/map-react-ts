@@ -1,6 +1,7 @@
-import { Button } from "@mui/material";
+import { IconButton } from "@radix-ui/themes";
 import { TrashIcon } from "@radix-ui/react-icons";
 import { AlertDialog } from "radix-ui";
+import "@radix-ui/themes/styles.css";
 
 interface AlertProps {
 	name: string;
@@ -10,9 +11,9 @@ interface AlertProps {
 const AlertDialogMarker: React.FC<AlertProps> = ({ name, onDelete }) => (
 	<AlertDialog.Root>
 		<AlertDialog.Trigger asChild>
-			<Button size="small" color="error">
-				<TrashIcon />
-			</Button>
+			<IconButton radius="large" color="crimson">
+				<TrashIcon width="35" height="35" />
+			</IconButton>
 		</AlertDialog.Trigger>
 		<AlertDialog.Portal>
 			<AlertDialog.Overlay className="AlertDialogOverlay" />

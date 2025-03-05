@@ -33,6 +33,8 @@ interface TabsComponentProps {
   setPageTitle: React.Dispatch<React.SetStateAction<any>>;
   updatePosition: React.Dispatch<React.SetStateAction<any>>;
   API: string;
+  latitude: number;
+	longitude: number;
   filteredMarkeredData: any[];
   handleRemove: (id: string) => void;
   handleEdit: (id: string) => void;
@@ -56,6 +58,8 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
   setMarkerData,
   setPageTitle,
   updatePosition,
+  latitude,
+  longitude,
   API
 }) => {
   const isMobile = useResponsiveTabs();
@@ -97,12 +101,14 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
               handleEdit={handleEdit}
               handleTarget={handleTarget}
               API={API}
+              latitude={latitude}
+              longitude={longitude}
             />
           </Tabs.Content>
         </Tabs.Root>
         </div>
     ) : (
-      <div>
+      <div className="side-panel-desktopview">
         <div className="TabsContent">
 
          <MarkersComponent
@@ -119,6 +125,8 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
               handleEdit={handleEdit}
               handleTarget={handleTarget}
               API={API}
+              latitude={latitude}
+              longitude={longitude}
             />
             </div>
             <div className="TabsContent">

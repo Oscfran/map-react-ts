@@ -11,7 +11,7 @@ import * as Select from "@radix-ui/react-select";
 import * as Slider from "@radix-ui/react-slider";
 import type React from "react";
 import getLocationName from "../Utils/getLocationName.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface AddMarkerDialogProps {
@@ -23,6 +23,8 @@ interface AddMarkerDialogProps {
 	setPageTitle: React.Dispatch<React.SetStateAction<any>>;
 	updatePosition: React.Dispatch<React.SetStateAction<any>>;
 	API: string;
+	latitude: number;
+	longitude: number;
 }
 
 interface MarkerFormData {
@@ -38,7 +40,7 @@ interface MarkerFormData {
 	imageURLs: string[];
 }
 
-const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers, setMarkers,  setMarkerData, setPageTitle, updatePosition, API}) => {
+const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers, setMarkers,  setMarkerData, setPageTitle, updatePosition, API, latitude, longitude}) => {
 	const generateId = () => crypto.randomUUID();
 	const { register, handleSubmit, setValue, reset } = useForm<MarkerFormData>({
 		defaultValues: {
@@ -47,6 +49,8 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 			rating: 5,
 			favorite: false,
 			foodType: "Asian",
+			lat:latitude,
+			lng: longitude
 		},
 	});
 	const [sliderValue, setSliderValue] = useState(5);
@@ -81,12 +85,17 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 		data.imageURLs = imageURLs;
 		setMarkers([...markers, marker]);
 		setMarkerData((prev) => [...prev, data]);
+		reset();
 		setPageTitle(await getLocationName(Number(data.lat), Number(data.lng), API));
 		updatePosition(pos);
-		reset();
 		setImageURLs([]);
 		setValue("id", generateId());
 	};
+
+	useEffect(() => {
+		setValue('lat', latitude);
+		setValue('lng', longitude)
+	}, [latitude, longitude, setValue])
 
 	return (
 		<Dialog.Portal>
@@ -118,7 +127,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							className="Input"
 							id="latitude"
 							type="number"
-							step="0.000001"
+							step="0.000000000000001"
 							min="-90"
 							max="90"
 							placeholder="Enter latitude"
@@ -134,7 +143,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							className="Input"
 							id="longitude"
 							type="number"
-							step="0.000001"
+							step="0.0000000000000001"
 							min="-180"
 							max="180"
 							placeholder="Enter longitude"

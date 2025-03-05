@@ -1,5 +1,4 @@
 import {
-	Button,
 	Card,
 	CardActions,
 	CardContent,
@@ -8,14 +7,17 @@ import {
 import {
 	HeartFilledIcon,
 	HeartIcon,
-	Pencil1Icon,
 	StarIcon,
 	TargetIcon,
 } from "@radix-ui/react-icons";
+import {
+	IconButton
+} from "@radix-ui/themes"
 import type * as React from "react";
 import { A11y, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import AlertDialogMarker from "./AlertDialogMarker.tsx";
+import "@radix-ui/themes/styles.css";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -90,17 +92,14 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 				<Typography variant="h6">Food type: {foodType}</Typography>
 			</CardContent>
 			<CardActions className="bottom-card">
-				{favorite ? <HeartFilledIcon /> : <HeartIcon />}
+				{favorite ? <HeartFilledIcon  width="35" height="35"/> : <HeartIcon width="35" height="35"/>}
 				<div>
-					<StarIcon />
+					<StarIcon width="35" height="35"/>
 					{rating}
 				</div>
-				<Button size="large" onClick={onTarget} aria-label="Get to location">
-					<TargetIcon />
-				</Button>
-				<Button size="large" onClick={onEdit} aria-label="Edit marker">
-					<Pencil1Icon />
-				</Button>
+				<IconButton radius="large" color="purple" variant="soft" onClick={onTarget} aria-label="Get to location">
+					<TargetIcon width="35" height="35"/>
+				</IconButton>
 				<AlertDialogMarker
 					name={name}
 					onDelete={() => onDelete()}

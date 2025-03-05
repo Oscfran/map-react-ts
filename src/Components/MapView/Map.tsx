@@ -1,6 +1,6 @@
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import useClipboard from "../Hooks/useClipboard.tsx";
 import useDocumentTitle from "../Hooks/useDocumentTitle.tsx";
 import useQueryParameters from "../Hooks/useQueryParameters.tsx";
@@ -58,7 +58,6 @@ const MapApi = () => {
 		"markers",
 		[],
 	);
-	const [imageURL, setImageURL] = useState<string>("");
 	const clearFilters = () => {
 		setFilters({
 			searchQuery: "",
@@ -184,10 +183,8 @@ const MapApi = () => {
 			}) => {
 				const clickedLat = e.latLng.lat();
 				const clickedLng = e.latLng.lng();
-				setLatitude(clickedLat);
-				setLongitude(clickedLng);
-				setValue("lat", clickedLat);
-				setValue("lng", clickedLng);
+				setLatitude(Number(clickedLat));
+				setLongitude(Number(clickedLng));
 				setStoredLocation({
 					lat: clickedLat,
 					lng: clickedLng,
@@ -380,6 +377,8 @@ const MapApi = () => {
 			setPageTitle={setPageTitle}
 			updatePosition={updatePosition}
 			API={API}
+			latitude={latitude}
+			longitude={longitude}
 		/>
 	);
 };

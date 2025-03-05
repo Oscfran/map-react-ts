@@ -31,6 +31,8 @@ interface MarkersComponentProps {
   setPageTitle: React.Dispatch<React.SetStateAction<any>>;
   updatePosition: React.Dispatch<React.SetStateAction<any>>;
   API: string;
+  latitude: number;
+	longitude: number;
 	filteredMarkeredData: Marker[];
 	handleRemove: (id: string) => void;
 	handleEdit: (id: string) => void;
@@ -51,6 +53,8 @@ const MarkersComponent: React.FC<MarkersComponentProps> = ({
   setPageTitle,
   updatePosition,
   API,
+  latitude,
+  longitude
 }) => {
 	return (
 		<div className="markers-container">
@@ -61,7 +65,7 @@ const MarkersComponent: React.FC<MarkersComponentProps> = ({
 						className="Button violet"
 						onClick={() => setOpen(true)}
 					>
-						Add new marker
+						Add new restaurant
 					</button>
 				</Dialog.Trigger>
 
@@ -74,13 +78,15 @@ const MarkersComponent: React.FC<MarkersComponentProps> = ({
           setPageTitle={setPageTitle}
           updatePosition={updatePosition}
           API={API}
+          latitude={latitude}
+          longitude={longitude}
         />
 			</Dialog.Root>
 
 			<div className="marker-list">
-				<h2>List of markers</h2>
+				<h2>List of Restaurants</h2>
 				{filteredMarkeredData.length === 0 ? (
-					<p>No markers to show</p>
+					<p>No restaurants to show</p>
 				) : (
 					filteredMarkeredData.map((marker) => (
 						<MarkerCard
