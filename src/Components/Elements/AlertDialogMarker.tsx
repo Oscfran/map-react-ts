@@ -11,7 +11,7 @@ interface AlertProps {
 const AlertDialogMarker: React.FC<AlertProps> = ({ name, onDelete }) => (
 	<AlertDialog.Root>
 		<AlertDialog.Trigger asChild>
-			<IconButton radius="large" color="crimson">
+			<IconButton radius="full" aria-label="delete restaurant" color="crimson" variant="ghost">
 				<TrashIcon width="35" height="35" />
 			</IconButton>
 		</AlertDialog.Trigger>

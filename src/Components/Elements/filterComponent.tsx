@@ -8,8 +8,16 @@ import {
 import * as Slider from "@radix-ui/react-slider";
 import { Accordion } from "radix-ui";
 import { useState } from "react";
+import SquareToggleButton from "./SquareToggleButton";
 import classNames from "classnames";
 import * as React from "react";
+
+import asianFoodIcon from "/src/assets/asian-food-icon.svg";
+import italianFoodIcon from "/src/assets/italian-food-icon.svg";
+import fastFoodIcon from "/src/assets/fast-food-icon.svg";
+import fineDiningIcon from "/src/assets/fine-dining-icon.svg";
+import localFoodIcon from "/src/assets/local-food-icon.svg";
+import buffetIcon from "/src/assets/buffet-icon.svg";
 
 interface FiltersProps {
 	filters: {
@@ -72,7 +80,7 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 			/>
 			<button
 				type="button"
-				className="Button violet"
+				className="Button orange"
 				onClick={() => {
 					filters.clearFilters();
 					setPriceSliderValue(500);
@@ -180,107 +188,48 @@ const Filters: React.FC<FiltersProps> = ({ filters, setFilters }) => {
 				<AccordionTrigger>Categories</AccordionTrigger>
 				<AccordionContent>
 					<div className="food-types">
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.asianFood}
-								aria-label="Check box filter asian food"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, asianFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Asian Food</label>
-						</div>
+						<SquareToggleButton
+							isActive = {filters.asianFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,asianFood: value}))}
+							label="Asian"
+							icon={asianFoodIcon}
+						/>
 
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.italianFood}
-								aria-label="Check box filter italian food"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, italianFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Italian Food</label>
-						</div>
+						<SquareToggleButton
+							isActive = {filters.italianFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,italianFood: value}))}
+							label="Italian"
+							icon={italianFoodIcon}
+						/>
 
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.fastFood}
-								aria-label="Check box filter fast food"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, fastFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Fast Food</label>
-						</div>
+						<SquareToggleButton
+							isActive = {filters.fastFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,fastFood: value}))}
+							label="Fast Food"
+							icon={fastFoodIcon}
+						/>	
 
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.fineDiningFood}
-								aria-label="Check box filter fine dining food"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, fineDiningFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Fine Dining Food</label>
-						</div>
+						<SquareToggleButton
+							isActive = {filters.fineDiningFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,fineDiningFood: value}))}
+							label="Fine Dining"
+							icon={fineDiningIcon}
+						/>	
+						
+						<SquareToggleButton
+							isActive = {filters.localFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,localFood: value}))}
+							label="Local Food"
+							icon={localFoodIcon}
+						/>	
 
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.localFood}
-								aria-label="Check box filter local food"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, localFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Local Food</label>
-						</div>
+						<SquareToggleButton
+							isActive = {filters.buffetFood}
+							onToggle={(value) => setFilters((prev) => ({...prev,buffetFood: value}))}
+							label="Buffet"
+							icon={buffetIcon}
+						/>	
 
-						<div className="checkbox-wrapper">
-							<CheckBox.Root
-								checked={filters.buffetFood}
-								aria-label="Check box filter buffed"
-								onCheckedChange={(checked) =>
-									setFilters((prev) => ({ ...prev, buffetFood: !!checked }))
-								}
-								className="CheckboxRoot"
-							>
-								<CheckBox.Indicator className="CheckboxInicator">
-									<CheckIcon />
-								</CheckBox.Indicator>
-							</CheckBox.Root>
-							{/* biome-ignore lint/a11y/noLabelWithoutControl: <explanation> */}
-							<label className="Label-checkbox">Buffet</label>
-						</div>
 					</div>
 				</AccordionContent>
 			</Accordion.Item>

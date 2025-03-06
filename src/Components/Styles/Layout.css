@@ -1,4 +1,7 @@
+@import url('https://fonts.cdnfonts.com/css/audrey');
+
 .header-bar {
+	z-index: 0;
 	position: relative;
 	min-width: 300px;
 	height: 50px;
@@ -28,10 +31,17 @@
 	cursor: default;
 	user-select: none;
 }
+.logo-image{
+	color: #ffffff;
+	margin-left: 10px;
+	margin-right: 10px;
+	width: auto;
+	height: 50px;
+}
+
 .slider-menu {
 	position: absolute;
 	top: 0;
-	right: 0;
 	display: flex;
 	list-style-type: none;
 	margin: 0;
@@ -62,6 +72,8 @@
 }
 
 .item a {
+	font-family: 'Audrey', sans-serif;
+	font-size: 20px;
 	display: inline-flex;
 	padding: 14px;
 	margin-left: 2px;
@@ -79,16 +91,10 @@
 body {
 	background-image: linear-gradient(
 		to bottom right,
-		#3d0e61,
-		#461177,
-		#4e148c,
-		#5829a7,
-		#613dc1,
-		#7364d2,
-		#858ae3,
-		#8eb5f0,
-		#93caf6,
-		#97dffc
+		#c1853b,
+		#cc1b1b,
+		#2f0505,
+		#85311b
 	);
 	margin-top: 0;
 	font-family: "Mona Sans", system-ui, sans-serif;

@@ -88,24 +88,6 @@ const MapApi = () => {
 		maxPrice: 500,
 		clearFilters: () => clearFilters(),
 	});
-	const {
-		register,
-		handleSubmit,
-		setValue,
-		watch,
-		reset,
-		formState: { errors },
-	} = useForm<MarkerInfo>({
-		defaultValues: {
-			id: generateId(),
-			imageURLs: [],
-			rating: 5,
-			favorite: false,
-			foodType: "Asian",
-		},
-	});
-	const [sliderValue, setSliderValue] = useState(5);
-	const imageURLs = watch("imageURLs") || [];
 
 	useEffect(() => {
 		// Initialize and add the map

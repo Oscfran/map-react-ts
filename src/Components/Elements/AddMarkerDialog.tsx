@@ -40,9 +40,10 @@ interface MarkerFormData {
 	imageURLs: string[];
 }
 
+
 const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers, setMarkers,  setMarkerData, setPageTitle, updatePosition, API, latitude, longitude}) => {
 	const generateId = () => crypto.randomUUID();
-	const { register, handleSubmit, setValue, reset } = useForm<MarkerFormData>({
+	const { register, handleSubmit, setValue, reset, setError, formState:  { errors }} = useForm<MarkerFormData>({
 		defaultValues: {
 			id: generateId(),
 			imageURLs: [],
@@ -57,6 +58,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 	const [favorite, setFavorite] = useState(false);
 	const [imageURL, setImageURL] = useState("");
 	const [imageURLs, setImageURLs] = useState<string[]>([]);
+	const [errorMessage, setErrorMessage ] = useState<string>()
 
 
 	const handleAddImage = () => {
@@ -97,6 +99,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 		setValue('lng', longitude)
 	}, [latitude, longitude, setValue])
 
+
 	return (
 		<Dialog.Portal>
 			<Dialog.Overlay className="DialogOverlay" />
@@ -115,8 +118,9 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							id="name"
 							type="text"
 							placeholder="Enter name"
-							{...register("name", { required: true, minLength: 4 })}
+							{...register("name", { required: true })}
 						/>
+						{errors.name && <p>{errors.name.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -133,6 +137,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							placeholder="Enter latitude"
 							{...register("lat", { required: true })}
 						/>
+						{errors.lat && <p>{errors.lat.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -149,6 +154,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							placeholder="Enter longitude"
 							{...register("lng", { required: true })}
 						/>
+						{errors.lng && <p>{errors.lng.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -163,8 +169,9 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							maxLength={200}
 							{...register("description", { required: true })}
 						/>
+						{errors.description && <p>{errors.description.message}</p>}
 					</fieldset>
-
+					
 					<fieldset className="Fieldset">
 						<label className="Label">Rating</label>
 						<Slider.Root
@@ -201,6 +208,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							placeholder="Enter average price"
 							{...register("price", { required: true })}
 						/>
+						{errors.price && <p>{errors.price.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">

@@ -97,7 +97,7 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 					<StarIcon width="35" height="35"/>
 					{rating}
 				</div>
-				<IconButton radius="large" color="purple" variant="soft" onClick={onTarget} aria-label="Get to location">
+				<IconButton radius="large" color="orange" variant="ghost" onClick={onTarget} aria-label="Get to location">
 					<TargetIcon width="35" height="35"/>
 				</IconButton>
 				<AlertDialogMarker

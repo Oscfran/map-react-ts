@@ -62,7 +62,7 @@ const MarkersComponent: React.FC<MarkersComponentProps> = ({
 				<Dialog.Trigger asChild>
 					<button
 						type="button"
-						className="Button violet"
+						className="Button orange"
 						onClick={() => setOpen(true)}
 					>
 						Add new restaurant

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import * as Toggle from "@radix-ui/react-toggle";
 import { CheckIcon } from "@radix-ui/react-icons";
 
@@ -6,9 +6,10 @@ interface SquareToggleButtonProps {
   isActive: boolean;
   onToggle: (value: boolean) => void;
   label: string;
+  icon: string;
 }
 
-const SquareToggleButton: React.FC<SquareToggleButtonProps> = ({ isActive, onToggle, label }) => {
+const SquareToggleButton: React.FC<SquareToggleButtonProps> = ({ isActive, onToggle, label, icon }) => {
   return (
     <div className="toggle-container">
       <Toggle.Root
@@ -17,7 +18,7 @@ const SquareToggleButton: React.FC<SquareToggleButtonProps> = ({ isActive, onTog
         className={`square-toggle ${isActive ? "active" : ""}`}
         aria-label={`Toggle filter ${label}`}
       >
-        {isActive && <CheckIcon className="check-icon" />}
+        <img src={icon} alt={label} className="toggle-icon" />
       </Toggle.Root>
       <span className="toggle-label">{label}</span>
     </div>

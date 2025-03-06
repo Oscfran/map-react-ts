@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import Filters from "./FilterComponent.tsx";
 import MarkersComponent from "./MarkerCardComponent.tsx";
@@ -77,7 +77,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
           <Tabs.Content className="TabsContent" value="tab1">
             <button
                 type="button"
-                className="Button violet"
+                className="Button orange"
                 disabled={isLoading}
                 onClick={handleClickWhereAmI}
               >
@@ -132,7 +132,7 @@ const TabsComponent: React.FC<TabsComponentProps> = ({
             <div className="TabsContent">
             <button
 							type="button"
-							className="Button violet"
+							className="Button orange"
 							disabled={isLoading}
 							onClick={handleClickWhereAmI}
 						>
