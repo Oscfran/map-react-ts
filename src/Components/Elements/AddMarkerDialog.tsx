@@ -13,6 +13,7 @@ import type React from "react";
 import getLocationName from "../Utils/getLocationName.tsx";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import isValidURL from "../Utils/isValidURL.tsx";
 
 interface AddMarkerDialogProps {
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -61,10 +62,16 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 	const [errorMessage, setErrorMessage ] = useState<string>()
 
 
-	const handleAddImage = () => {
+	const handleAddImage = async () => {
 		if (imageURL.trim() !== "") {
-			setImageURLs([...imageURLs, imageURL]);
-			setImageURL("");
+			if (await isValidURL(imageURL)){
+				setImageURLs([...imageURLs, imageURL]);
+				setImageURL("");
+			}
+			alert("Insert an valid image link!!!");
+		}
+		else{
+			alert("Insert an image link!!!");
 		}
 	};
 
