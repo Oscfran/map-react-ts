@@ -44,7 +44,7 @@ interface MarkerFormData {
 
 const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers, setMarkers,  setMarkerData, setPageTitle, updatePosition, API, latitude, longitude}) => {
 	const generateId = () => crypto.randomUUID();
-	const { register, handleSubmit, setValue, reset, setError, formState:  { errors }} = useForm<MarkerFormData>({
+	const { register, handleSubmit, setValue, reset, formState:  { errors }} = useForm<MarkerFormData>({
 		defaultValues: {
 			id: generateId(),
 			imageURLs: [],
@@ -59,7 +59,6 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 	const [favorite, setFavorite] = useState(false);
 	const [imageURL, setImageURL] = useState("");
 	const [imageURLs, setImageURLs] = useState<string[]>([]);
-	const [errorMessage, setErrorMessage ] = useState<string>()
 
 
 	const handleAddImage = async () => {
@@ -106,6 +105,12 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 		setValue('lng', longitude)
 	}, [latitude, longitude, setValue])
 
+	useEffect(() => {
+		if (Object.keys(errors).length > 0){
+			alert("Please correct the errors in the form before submiting.");
+		}
+	}, [errors])
+
 
 	return (
 		<Dialog.Portal>
@@ -125,9 +130,9 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							id="name"
 							type="text"
 							placeholder="Enter name"
-							{...register("name", { required: true })}
+							{...register("name", { required: "Name is required" })}
 						/>
-						{errors.name && <p>{errors.name.message}</p>}
+						{errors.name && <p className="error-message">{errors.name.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -142,9 +147,12 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							min="-90"
 							max="90"
 							placeholder="Enter latitude"
-							{...register("lat", { required: true })}
+							{...register("lat", { required: "Latitude is required",
+								min: {value: -90, message: "Min latitude is -90"},
+								max: {value: 90, message: "Max latitude is 90"},
+							 })}
 						/>
-						{errors.lat && <p>{errors.lat.message}</p>}
+						{errors.lat && <p className="error-message">{errors.lat.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -159,9 +167,12 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							min="-180"
 							max="180"
 							placeholder="Enter longitude"
-							{...register("lng", { required: true })}
+							{...register("lng", { required: "Longitude is Required",
+								min: {value: -180, message: "Min longitude is -180"},
+								max: {value: 180, message: "Max longitude is 180"},
+							 })}
 						/>
-						{errors.lng && <p>{errors.lng.message}</p>}
+						{errors.lng && <p className="error-message" >{errors.lng.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">
@@ -174,9 +185,9 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							type="text"
 							placeholder="Enter description"
 							maxLength={200}
-							{...register("description", { required: true })}
+							{...register("description", { required: "Description is required" })}
 						/>
-						{errors.description && <p>{errors.description.message}</p>}
+						{errors.description && <p className="error-message">{errors.description.message}</p>}
 					</fieldset>
 					
 					<fieldset className="Fieldset">
@@ -210,12 +221,15 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 							className="Input"
 							id="price"
 							type="number"
-							min={0}
+							min={1}
 							max={500}
 							placeholder="Enter average price"
-							{...register("price", { required: true })}
+							{...register("price", { required: "Price is required",
+								min: {value: 1, message: "Min price is 1"},
+								max: {value: 500, message: "Max price 500"},
+							 })}
 						/>
-						{errors.price && <p>{errors.price.message}</p>}
+						{errors.price && <p className="error-message">{errors.price.message}</p>}
 					</fieldset>
 
 					<fieldset className="Fieldset">

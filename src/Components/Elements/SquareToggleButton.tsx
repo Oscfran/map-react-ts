@@ -1,6 +1,5 @@
 import type React from "react";
 import * as Toggle from "@radix-ui/react-toggle";
-import { CheckIcon } from "@radix-ui/react-icons";
 
 interface SquareToggleButtonProps {
   isActive: boolean;

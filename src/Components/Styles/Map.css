@@ -13,7 +13,12 @@
 .toggle-button {
 	display: none;
 }
-
+.error-message{
+	color: #c40000;
+	font-size: 14px;
+	margin-top: 5px;
+	font-weight: bold;
+}
 .food-types {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);

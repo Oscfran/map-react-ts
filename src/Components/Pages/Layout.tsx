@@ -7,13 +7,13 @@ const Index = () => {
 		<>
 
 			<header className="header-bar">
-				<nav className="nav-bar" aria-label="Header Navigation">
+				<nav className="nav-bar" aria-label="Header Navigation" >
 					
 					<ul className="slider-menu">
 						<li className="item">
 							<Link to="/">The Redhead Restaurant Catalog</Link>
 						</li>
-						<li className="item">
+						<li className="item" aria-hidden={true}>
 							<img className="logo-image" src={myLogo} alt="restaurant-placeholder" />
 						</li>
 					</ul>
