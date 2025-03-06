@@ -68,7 +68,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 				setImageURLs([...imageURLs, imageURL]);
 				setImageURL("");
 			}
-			alert("Insert an valid image link!!!");
+			alert("Insert a valid image link!!!");
 		}
 		else{
 			alert("Insert an image link!!!");
@@ -265,6 +265,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 						<CheckBox.Root
 							checked={favorite}
 							className="CheckboxRoot"
+							aria-label="Favorite"
 							onCheckedChange={(checked) => {
 								setValue("favorite", !!checked);
 								setFavorite(!!checked);
@@ -326,7 +327,7 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 				</form>
 
 				<Dialog.Close asChild>
-					<button type="button" className="IconButton" aria-label="Close">
+					<button type="button" className="IconButton" aria-label="Close add new restaurant form">
 						<Cross2Icon />
 					</button>
 				</Dialog.Close>
