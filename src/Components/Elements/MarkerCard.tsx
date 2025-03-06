@@ -1,5 +1,4 @@
 import {
-	Button,
 	Card,
 	CardActions,
 	CardContent,
@@ -8,18 +7,27 @@ import {
 import {
 	HeartFilledIcon,
 	HeartIcon,
-	Pencil1Icon,
 	StarIcon,
-	TargetIcon
+	TargetIcon,
 } from "@radix-ui/react-icons";
+import {
+	IconButton
+} from "@radix-ui/themes"
 import type * as React from "react";
 import { A11y, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import AlertDialogMarker from "./AlertDialogMarker.tsx";
+import "@radix-ui/themes/styles.css";
 import "swiper/css";
 import "swiper/css/navigation";
 
-type Food = 'Asian' | 'Italian' | 'Fast-Food' | 'Fine-Dining' | 'Local-Food' | 'Buffet';
+type Food =
+	| "Asian"
+	| "Italian"
+	| "Fast-Food"
+	| "Fine-Dining"
+	| "Local-Food"
+	| "Buffet";
 
 interface MarkerCardProps {
 	name: string;
@@ -30,8 +38,8 @@ interface MarkerCardProps {
 	onTarget: () => void;
 	rating: number;
 	favorite: boolean;
-	price : number;
-	foodType : Food;
+	price: number;
+	foodType: Food;
 }
 const MarkerCard: React.FC<MarkerCardProps> = ({
 	name,
@@ -81,23 +89,22 @@ const MarkerCard: React.FC<MarkerCardProps> = ({
 				<Typography variant="h6" color="success">
 					Average Price: ${price}
 				</Typography>
-				<Typography variant="h6">
-					Food type: {foodType}
-				</Typography>
+				<Typography variant="h6">Food type: {foodType}</Typography>
 			</CardContent>
 			<CardActions className="bottom-card">
-				{favorite ? <HeartFilledIcon /> : <HeartIcon />}
+				{favorite ? <HeartFilledIcon  width="35" height="35"/> : <HeartIcon width="35" height="35"/>}
 				<div>
-					<StarIcon />
+					<StarIcon width="35" height="35"/>
 					{rating}
 				</div>
-				<Button size="large" onClick={onTarget} aria-label="Get to location">
-					<TargetIcon />
-				</Button>
-				<Button size="large" onClick={onEdit} aria-label="Edit marker">
-					<Pencil1Icon />
-				</Button>
-				<AlertDialogMarker name={name} onDelete={() => onDelete()}  aria-label="Delete marker"/>
+				<IconButton radius="large" color="purple" variant="soft" onClick={onTarget} aria-label="Get to location">
+					<TargetIcon width="35" height="35"/>
+				</IconButton>
+				<AlertDialogMarker
+					name={name}
+					onDelete={() => onDelete()}
+					aria-label="Delete marker"
+				/>
 			</CardActions>
 		</Card>
 	);
