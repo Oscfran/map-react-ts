@@ -67,7 +67,9 @@ const AddMarkerDialog: React.FC<AddMarkerDialogProps> = ({ setOpen, map ,markers
 				setImageURLs([...imageURLs, imageURL]);
 				setImageURL("");
 			}
-			alert("Insert a valid image link!!!");
+			else{
+				alert("Insert a valid image link!!!");
+			}
 		}
 		else{
 			alert("Insert an image link!!!");
